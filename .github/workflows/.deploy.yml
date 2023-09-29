@@ -2,8 +2,8 @@ name: Run indexer
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 7 * * *'
+  schedule:
+    - cron: '0 7 * * *'
 
 concurrency: run-indexer
 
@@ -30,7 +30,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add .
-          git commit -m "Add changes"
+          git commit -m "Update indexed files"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
