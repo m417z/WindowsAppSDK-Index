@@ -1,9 +1,10 @@
 # WindowsAppSDK-Index
 
 An index of [Windows App
-SDK](https://www.nuget.org/packages/Microsoft.WindowsAppSDK) (WinUI 3) NuGet
-package textual files, including headers, idl files, and winmd files converted
-to idl.
+SDK](https://www.nuget.org/packages/Microsoft.WindowsAppSDK) (WinUI 3) and
+[Microsoft.UI.Xaml](https://www.nuget.org/packages/Microsoft.UI.Xaml) (WinUI 2)
+NuGet packages. Primary textual files are indexed, including headers, idl files,
+and winmd files converted to idl.
 
 ## Motivation
 

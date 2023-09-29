@@ -7,6 +7,7 @@ from pathlib import Path
 import requests
 
 PACKAGE_NAMES_TO_INDEX = [
+    'Microsoft.UI.Xaml',
     'Microsoft.WindowsAppSDK',
 ]
 
