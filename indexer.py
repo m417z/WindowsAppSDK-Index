@@ -21,6 +21,10 @@ PACKAGES_TO_INDEX = [{
     'name': 'Microsoft.WindowsAppSDK',
 }]
 
+# Running cppwinrt makes the repository much larger (from 200MB to 8.5GB). It
+# can be run locally if needed.
+CPPWINRT_RUN = False
+
 # WINMDIDL_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\winmdidl.exe'
 WINMDIDL_PATH = R'winmdidl.exe'
 
@@ -74,8 +78,7 @@ def index_nuget_package_version(package_url: str, dir: Path, package_deps: dict)
 
     zip_path.unlink()
 
-    lib_dir = dir / 'lib'
-    if lib_dir.exists():
+    if CPPWINRT_RUN and (lib_dir := dir / 'lib') and lib_dir.exists():
         print(f'  Running cppwinrt...')
 
         cmd = [CPPWINRT_PATH, '-ref', '10.0.22621.0']

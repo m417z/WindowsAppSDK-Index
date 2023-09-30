@@ -4,7 +4,7 @@ An index of [Windows App
 SDK](https://www.nuget.org/packages/Microsoft.WindowsAppSDK) (WinUI 3) and
 [Microsoft.UI.Xaml](https://www.nuget.org/packages/Microsoft.UI.Xaml) (WinUI 2)
 NuGet packages. Primary textual files are indexed, including headers, idl files,
-winmd files converted to idl, and headers generated from these idl files.
+and winmd files converted to idl.
 
 ## Motivation
 
@@ -26,6 +26,3 @@ IInspectable"`](https://github.com/search?q=repo%3Am417z%2FWindowsAppSDK-Index+%
 For a more powerful experience, you can use [the github.dev
 version](https://github.dev/m417z/WindowsAppSDK-Index) or, of course, clone the
 repository.
-
-In addition, generated headers can be used to quickly copy interfaces when
-needed.
