@@ -69,6 +69,10 @@ def index_nuget_package_version(url: str, dir: Path):
         subprocess.check_call(cmd)
         path.unlink()
 
+    # Make sure the folder is not empty, otherwise it won't be committed.
+    if not any(dir.iterdir()):
+        (dir / '.empty').touch()
+
 
 def index_nuget_package(package_name: str):
     packages = get_nuget_package_versions(package_name)
