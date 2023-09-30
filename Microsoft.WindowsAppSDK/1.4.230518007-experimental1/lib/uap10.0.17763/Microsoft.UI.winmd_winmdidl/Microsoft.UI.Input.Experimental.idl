@@ -30,6 +30,15 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IClosable;
+
+        typedef struct Rect Rect;
+    }
+}
 namespace Microsoft
 {
     namespace UI

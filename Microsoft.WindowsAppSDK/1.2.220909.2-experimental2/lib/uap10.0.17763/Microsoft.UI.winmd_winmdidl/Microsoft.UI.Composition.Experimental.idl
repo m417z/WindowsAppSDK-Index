@@ -37,6 +37,38 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        namespace Numerics
+        {
+            typedef struct Matrix3x2 Matrix3x2;
+
+            typedef struct Matrix4x4 Matrix4x4;
+
+            typedef struct Vector2 Vector2;
+
+            typedef struct Vector3 Vector3;
+
+            typedef struct Vector4 Vector4;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Graphics
+    {
+        typedef struct SizeInt32 SizeInt32;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
 namespace Microsoft
 {
     namespace UI

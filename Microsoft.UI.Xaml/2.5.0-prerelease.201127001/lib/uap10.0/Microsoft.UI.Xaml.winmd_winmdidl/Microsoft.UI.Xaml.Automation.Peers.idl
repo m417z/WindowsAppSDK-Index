@@ -98,6 +98,28 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Automation
+            {
+                namespace Provider
+                {
+                    interface IExpandCollapseProvider;
+
+                    interface IInvokeProvider;
+
+                    interface IRangeValueProvider;
+
+                    interface IToggleProvider;
+                }
+            }
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

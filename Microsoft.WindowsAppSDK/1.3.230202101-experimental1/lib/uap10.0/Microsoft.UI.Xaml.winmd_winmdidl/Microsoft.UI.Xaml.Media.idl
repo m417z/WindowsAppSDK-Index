@@ -108,6 +108,44 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        runtimeclass Deferral;
+
+        interface IClosable;
+
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+
+        typedef struct Size Size;
+
+        typedef struct TimeSpan TimeSpan;
+
+        runtimeclass Uri;
+    }
+}
+namespace Windows
+{
+    namespace Storage
+    {
+        namespace Streams
+        {
+            interface IInputStream;
+
+            interface IRandomAccessStream;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
 namespace Microsoft
 {
     namespace UI

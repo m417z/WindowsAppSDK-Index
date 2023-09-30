@@ -10,6 +10,13 @@ import "Windows.Foundation.idl";
 import "Windows.ApplicationModel.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        typedef struct PackageVersion PackageVersion;
+    }
+}
 namespace Microsoft
 {
     namespace Windows

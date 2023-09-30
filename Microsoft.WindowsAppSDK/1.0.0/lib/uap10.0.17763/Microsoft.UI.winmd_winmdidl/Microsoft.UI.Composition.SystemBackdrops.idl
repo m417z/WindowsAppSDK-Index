@@ -28,6 +28,40 @@ namespace Microsoft
         typedef struct WindowId WindowId;
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IClosable;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Composition
+        {
+            runtimeclass CompositionTarget;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Core
+        {
+            runtimeclass CoreWindow;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

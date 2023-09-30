@@ -69,6 +69,34 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+    }
+}
+namespace Windows
+{
+    namespace System
+    {
+        typedef enum VirtualKey VirtualKey;
+
+        typedef enum VirtualKeyModifiers VirtualKeyModifiers;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Core
+        {
+            typedef struct CorePhysicalKeyStatus CorePhysicalKeyStatus;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

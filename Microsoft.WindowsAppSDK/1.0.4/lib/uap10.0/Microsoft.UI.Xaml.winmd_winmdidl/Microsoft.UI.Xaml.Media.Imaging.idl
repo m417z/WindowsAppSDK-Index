@@ -32,6 +32,49 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace Background
+        {
+            interface IBackgroundTaskInstance;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IAsyncAction;
+
+        interface IClosable;
+
+        runtimeclass Uri;
+    }
+}
+namespace Windows
+{
+    namespace Graphics
+    {
+        namespace Imaging
+        {
+            runtimeclass SoftwareBitmap;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Storage
+    {
+        namespace Streams
+        {
+            interface IBuffer;
+
+            interface IRandomAccessStream;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

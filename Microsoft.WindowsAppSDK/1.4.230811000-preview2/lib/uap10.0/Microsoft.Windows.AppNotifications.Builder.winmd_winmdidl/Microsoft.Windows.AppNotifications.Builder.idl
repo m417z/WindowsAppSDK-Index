@@ -10,6 +10,15 @@ import "Windows.Foundation.idl";
 import "Microsoft.Windows.AppNotifications.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct DateTime DateTime;
+
+        runtimeclass Uri;
+    }
+}
 namespace Microsoft
 {
     namespace Windows

@@ -34,6 +34,27 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        runtimeclass MemoryBuffer;
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        namespace Numerics
+        {
+            typedef struct Quaternion Quaternion;
+
+            typedef struct Vector3 Vector3;
+
+            typedef struct Vector4 Vector4;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

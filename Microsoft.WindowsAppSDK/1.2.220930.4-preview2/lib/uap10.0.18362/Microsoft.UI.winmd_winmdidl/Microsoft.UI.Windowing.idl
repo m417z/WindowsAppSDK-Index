@@ -31,6 +31,24 @@ namespace Microsoft
         typedef struct WindowId WindowId;
     }
 }
+namespace Windows
+{
+    namespace Graphics
+    {
+        typedef struct PointInt32 PointInt32;
+
+        typedef struct RectInt32 RectInt32;
+
+        typedef struct SizeInt32 SizeInt32;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
 namespace Microsoft
 {
     namespace UI

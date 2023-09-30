@@ -66,6 +66,28 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct DateTime DateTime;
+
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+
+        typedef struct Size Size;
+
+        typedef struct TimeSpan TimeSpan;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
 namespace Microsoft
 {
     namespace UI

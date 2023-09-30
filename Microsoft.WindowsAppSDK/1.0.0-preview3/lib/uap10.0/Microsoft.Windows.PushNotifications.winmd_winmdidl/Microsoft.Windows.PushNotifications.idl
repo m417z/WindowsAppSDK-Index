@@ -10,6 +10,39 @@ import "Windows.ApplicationModel.Background.idl";
 import "Windows.Networking.PushNotifications.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace Background
+        {
+            delegate BackgroundTaskCanceledEventHandler;
+
+            runtimeclass BackgroundTaskDeferral;
+
+            interface IBackgroundCondition;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct DateTime DateTime;
+
+        runtimeclass Uri;
+    }
+}
+namespace Windows
+{
+    namespace Networking
+    {
+        namespace PushNotifications
+        {
+            runtimeclass PushNotificationChannel;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace Windows

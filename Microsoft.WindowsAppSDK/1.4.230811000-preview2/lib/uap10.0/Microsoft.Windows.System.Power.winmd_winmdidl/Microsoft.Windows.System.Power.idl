@@ -9,6 +9,13 @@ import "windowscontracts.idl";
 import "Windows.Foundation.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct TimeSpan TimeSpan;
+    }
+}
 namespace Microsoft
 {
     namespace Windows

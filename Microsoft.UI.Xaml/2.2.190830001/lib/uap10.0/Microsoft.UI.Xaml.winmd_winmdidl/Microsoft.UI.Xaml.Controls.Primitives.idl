@@ -33,6 +33,70 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        namespace Numerics
+        {
+            typedef struct Vector4 Vector4;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct Rect Rect;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Controls
+            {
+                runtimeclass AutoSuggestBox;
+
+                runtimeclass ComboBox;
+
+                runtimeclass IconElement;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Data
+            {
+                interface IValueConverter;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            runtimeclass DependencyProperty;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

@@ -115,6 +115,31 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct Rect Rect;
+
+        runtimeclass Uri;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Text
+        {
+            typedef enum FontStretch FontStretch;
+
+            typedef enum FontStyle FontStyle;
+
+            typedef struct FontWeight FontWeight;
+
+            typedef enum TextDecorations TextDecorations;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

@@ -287,6 +287,15 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+    }
+}
 namespace Microsoft
 {
     namespace UI

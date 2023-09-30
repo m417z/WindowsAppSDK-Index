@@ -54,6 +54,331 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace Contacts
+        {
+            runtimeclass Contact;
+        }
+    }
+}
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace DataTransfer
+        {
+            runtimeclass DataPackage;
+
+            typedef enum DataPackageOperation DataPackageOperation;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        namespace Collections
+        {
+            interface IVectorChangedEventArgs;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        runtimeclass Deferral;
+
+        interface IAsyncAction;
+
+        interface IClosable;
+
+        interface IStringable;
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        namespace Numerics
+        {
+            typedef struct Vector2 Vector2;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+
+        typedef struct Size Size;
+
+        typedef struct TimeSpan TimeSpan;
+
+        runtimeclass Uri;
+    }
+}
+namespace Windows
+{
+    namespace Globalization
+    {
+        namespace NumberFormatting
+        {
+            interface INumberFormatter2;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Composition
+        {
+            runtimeclass CompositionAnimation;
+
+            runtimeclass CompositionObject;
+
+            runtimeclass CompositionPropertySet;
+
+            runtimeclass Compositor;
+
+            runtimeclass Visual;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Text
+        {
+            typedef enum FontStyle FontStyle;
+
+            typedef struct FontWeight FontWeight;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            runtimeclass BringIntoViewRequestedEventArgs;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Controls
+            {
+                runtimeclass AutoSuggestBox;
+
+                runtimeclass DataTemplateSelector;
+
+                interface ICommandBarElement;
+
+                runtimeclass IconElement;
+
+                runtimeclass MenuFlyoutItemBase;
+
+                typedef enum Orientation Orientation;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Controls
+            {
+                namespace Primitives
+                {
+                    runtimeclass ButtonBase;
+
+                    runtimeclass FlyoutBase;
+                }
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Controls
+            {
+                runtimeclass ScrollViewer;
+
+                delegate SelectionChangedEventHandler;
+
+                runtimeclass StyleSelector;
+
+                typedef enum Symbol Symbol;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            typedef struct CornerRadius CornerRadius;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Data
+            {
+                interface INotifyPropertyChanged;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            runtimeclass DataTemplate;
+
+            runtimeclass DependencyObject;
+
+            runtimeclass DependencyProperty;
+
+            delegate DragEventHandler;
+
+            runtimeclass FrameworkElement;
+
+            typedef struct GridLength GridLength;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Input
+            {
+                interface ICommand;
+
+                runtimeclass InputScope;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Interop
+            {
+                interface INotifyCollectionChanged;
+
+                runtimeclass NotifyCollectionChangedEventArgs;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Media
+            {
+                namespace Animation
+                {
+                    runtimeclass NavigationTransitionInfo;
+
+                    runtimeclass TransitionCollection;
+                }
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Media
+            {
+                runtimeclass Brush;
+
+                runtimeclass FontFamily;
+
+                runtimeclass Geometry;
+
+                runtimeclass ImageBrush;
+
+                runtimeclass ImageSource;
+
+                runtimeclass RectangleGeometry;
+
+                runtimeclass SolidColorBrush;
+
+                typedef enum Stretch Stretch;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            runtimeclass Style;
+
+            typedef enum TextAlignment TextAlignment;
+
+            typedef enum TextReadingOrder TextReadingOrder;
+
+            typedef struct Thickness Thickness;
+
+            runtimeclass UIElement;
+
+            typedef enum Visibility Visibility;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

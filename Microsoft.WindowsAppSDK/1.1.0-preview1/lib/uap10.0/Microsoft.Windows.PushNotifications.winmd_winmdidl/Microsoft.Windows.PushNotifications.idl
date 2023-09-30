@@ -9,6 +9,27 @@ import "Windows.Foundation.idl";
 import "Windows.ApplicationModel.Background.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace Background
+        {
+            delegate BackgroundTaskCanceledEventHandler;
+
+            runtimeclass BackgroundTaskDeferral;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct DateTime DateTime;
+
+        runtimeclass Uri;
+    }
+}
 namespace Microsoft
 {
     namespace Windows

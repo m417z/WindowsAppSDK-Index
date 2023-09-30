@@ -14,6 +14,95 @@ import "Windows.UI.idl";
 import "Windows.UI.Core.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace DataTransfer
+        {
+            typedef enum DataPackageOperation DataPackageOperation;
+        }
+    }
+}
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace DataTransfer
+        {
+            namespace DragDrop
+            {
+                namespace Core
+                {
+                    runtimeclass CoreDragInfo;
+
+                    runtimeclass CoreDragUIOverride;
+                }
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct DateTime DateTime;
+
+        runtimeclass Deferral;
+
+        interface IAsyncAction;
+
+        interface IClosable;
+
+        interface IMemoryBufferReference;
+
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+    }
+}
+namespace Windows
+{
+    namespace Security
+    {
+        namespace Cryptography
+        {
+            namespace Certificates
+            {
+                runtimeclass Certificate;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace Storage
+    {
+        namespace Streams
+        {
+            interface IRandomAccessStream;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Core
+        {
+            runtimeclass CoreCursor;
+
+            runtimeclass CoreWindow;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace Web

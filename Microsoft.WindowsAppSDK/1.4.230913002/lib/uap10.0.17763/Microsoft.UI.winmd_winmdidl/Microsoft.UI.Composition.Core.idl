@@ -28,6 +28,15 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IAsyncAction;
+
+        interface IClosable;
+    }
+}
 namespace Microsoft
 {
     namespace UI

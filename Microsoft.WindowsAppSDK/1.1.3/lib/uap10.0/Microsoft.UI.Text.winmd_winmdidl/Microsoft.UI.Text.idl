@@ -11,6 +11,46 @@ import "Windows.UI.idl";
 import "Windows.UI.Text.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+    }
+}
+namespace Windows
+{
+    namespace Storage
+    {
+        namespace Streams
+        {
+            interface IRandomAccessStream;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Text
+        {
+            typedef enum FontStretch FontStretch;
+
+            typedef enum FontStyle FontStyle;
+
+            typedef struct FontWeight FontWeight;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

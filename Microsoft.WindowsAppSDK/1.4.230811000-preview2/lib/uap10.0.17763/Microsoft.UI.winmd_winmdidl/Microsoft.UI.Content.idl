@@ -57,6 +57,53 @@ namespace Microsoft
         typedef struct WindowId WindowId;
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        namespace Collections
+        {
+            interface IPropertySet;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IClosable;
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        namespace Numerics
+        {
+            typedef struct Vector2 Vector2;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+    }
+}
+namespace Windows
+{
+    namespace Graphics
+    {
+        typedef struct PointInt32 PointInt32;
+
+        typedef struct RectInt32 RectInt32;
+
+        typedef struct SizeInt32 SizeInt32;
+    }
+}
 namespace Microsoft
 {
     namespace UI

@@ -37,6 +37,208 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace Contacts
+        {
+            runtimeclass Contact;
+        }
+    }
+}
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace DataTransfer
+        {
+            runtimeclass DataPackage;
+
+            typedef enum DataPackageOperation DataPackageOperation;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        runtimeclass Deferral;
+
+        runtimeclass Uri;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Text
+        {
+            typedef enum FontStyle FontStyle;
+
+            typedef struct FontWeight FontWeight;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Automation
+            {
+                namespace Provider
+                {
+                    interface IExpandCollapseProvider;
+
+                    interface IInvokeProvider;
+
+                    interface IToggleProvider;
+                }
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Controls
+            {
+                runtimeclass AutoSuggestBox;
+
+                runtimeclass DataTemplateSelector;
+
+                interface ICommandBarElement;
+
+                runtimeclass IconElement;
+
+                runtimeclass MenuFlyoutItemBase;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Controls
+            {
+                namespace Primitives
+                {
+                    runtimeclass FlyoutBase;
+                }
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Controls
+            {
+                runtimeclass StyleSelector;
+
+                typedef enum Symbol Symbol;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            runtimeclass DataTemplate;
+
+            runtimeclass DependencyObject;
+
+            runtimeclass DependencyProperty;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Input
+            {
+                interface ICommand;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Media
+            {
+                namespace Animation
+                {
+                    runtimeclass NavigationTransitionInfo;
+
+                    runtimeclass TransitionCollection;
+                }
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Media
+            {
+                runtimeclass Brush;
+
+                runtimeclass FontFamily;
+
+                runtimeclass Geometry;
+
+                runtimeclass ImageSource;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            runtimeclass Style;
+
+            typedef struct Thickness Thickness;
+
+            runtimeclass UIElement;
+
+            typedef enum Visibility Visibility;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

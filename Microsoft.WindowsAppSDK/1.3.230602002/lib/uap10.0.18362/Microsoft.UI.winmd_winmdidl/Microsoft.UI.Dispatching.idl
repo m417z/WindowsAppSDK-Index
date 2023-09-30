@@ -17,6 +17,17 @@ namespace Microsoft
         apicontract WindowsAppSDKContract;
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        runtimeclass Deferral;
+
+        interface IAsyncAction;
+
+        typedef struct TimeSpan TimeSpan;
+    }
+}
 namespace Microsoft
 {
     namespace UI

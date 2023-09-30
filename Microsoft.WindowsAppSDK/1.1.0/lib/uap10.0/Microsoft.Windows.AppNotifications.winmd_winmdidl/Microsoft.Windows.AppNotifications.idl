@@ -9,6 +9,15 @@ import "windowscontracts.idl";
 import "Windows.Foundation.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct DateTime DateTime;
+
+        interface IAsyncAction;
+    }
+}
 namespace Microsoft
 {
     namespace Windows

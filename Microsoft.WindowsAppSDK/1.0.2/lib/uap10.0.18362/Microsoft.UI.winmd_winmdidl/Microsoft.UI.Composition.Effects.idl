@@ -18,6 +18,18 @@ namespace Microsoft
         apicontract WindowsAppSDKContract;
     }
 }
+namespace Windows
+{
+    namespace Graphics
+    {
+        namespace Effects
+        {
+            interface IGraphicsEffect;
+
+            interface IGraphicsEffectSource;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

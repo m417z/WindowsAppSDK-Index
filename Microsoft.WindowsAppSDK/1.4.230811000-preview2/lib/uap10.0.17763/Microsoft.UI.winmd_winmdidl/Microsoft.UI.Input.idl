@@ -50,6 +50,47 @@ namespace Microsoft
         typedef struct WindowId WindowId;
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IClosable;
+
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+
+        typedef struct TimeSpan TimeSpan;
+    }
+}
+namespace Windows
+{
+    namespace Graphics
+    {
+        typedef struct RectInt32 RectInt32;
+    }
+}
+namespace Windows
+{
+    namespace System
+    {
+        typedef enum VirtualKey VirtualKey;
+
+        typedef enum VirtualKeyModifiers VirtualKeyModifiers;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Core
+        {
+            runtimeclass CoreCursor;
+
+            typedef enum CoreVirtualKeyStates CoreVirtualKeyStates;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

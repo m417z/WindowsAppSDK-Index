@@ -24,6 +24,71 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct Point Point;
+
+        typedef struct TimeSpan TimeSpan;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Composition
+        {
+            typedef enum CompositionColorSpace CompositionColorSpace;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            typedef enum ApplicationTheme ApplicationTheme;
+
+            runtimeclass DependencyProperty;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Media
+            {
+                typedef enum BrushMappingMode BrushMappingMode;
+
+                typedef enum GradientSpreadMethod GradientSpreadMethod;
+
+                runtimeclass GradientStop;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            runtimeclass UIElement;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

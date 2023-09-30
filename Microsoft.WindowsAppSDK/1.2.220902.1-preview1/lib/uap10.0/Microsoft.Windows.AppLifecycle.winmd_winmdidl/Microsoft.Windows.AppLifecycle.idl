@@ -10,6 +10,23 @@ import "Windows.Foundation.idl";
 import "Windows.ApplicationModel.Core.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace Core
+        {
+            typedef enum AppRestartFailureReason AppRestartFailureReason;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IAsyncAction;
+    }
+}
 namespace Microsoft
 {
     namespace Windows

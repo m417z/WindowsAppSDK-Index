@@ -29,6 +29,16 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Devices
+    {
+        namespace Input
+        {
+            runtimeclass PenDevice;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

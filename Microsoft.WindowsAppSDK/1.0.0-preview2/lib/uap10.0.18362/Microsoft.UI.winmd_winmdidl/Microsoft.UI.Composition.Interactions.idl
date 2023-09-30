@@ -52,6 +52,16 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        namespace Numerics
+        {
+            typedef struct Vector3 Vector3;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

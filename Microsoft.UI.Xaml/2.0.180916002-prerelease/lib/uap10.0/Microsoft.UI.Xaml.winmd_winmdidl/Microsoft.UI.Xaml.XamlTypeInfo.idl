@@ -9,6 +9,19 @@ import "Windows.Foundation.idl";
 import "Windows.UI.Xaml.Markup.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Markup
+            {
+                interface IXamlMetadataProvider;
+            }
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

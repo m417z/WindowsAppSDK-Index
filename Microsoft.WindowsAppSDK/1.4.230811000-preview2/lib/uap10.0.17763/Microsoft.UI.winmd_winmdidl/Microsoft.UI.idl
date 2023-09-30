@@ -18,6 +18,13 @@ namespace Microsoft
         apicontract WindowsAppSDKContract;
     }
 }
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
 namespace Microsoft
 {
     namespace UI

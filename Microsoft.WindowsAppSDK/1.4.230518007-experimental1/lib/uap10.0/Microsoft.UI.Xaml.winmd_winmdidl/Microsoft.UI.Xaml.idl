@@ -260,6 +260,153 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace Activation
+        {
+            runtimeclass BackgroundActivatedEventArgs;
+
+            runtimeclass CachedFileUpdaterActivatedEventArgs;
+
+            runtimeclass FileActivatedEventArgs;
+
+            runtimeclass FileOpenPickerActivatedEventArgs;
+
+            runtimeclass FileSavePickerActivatedEventArgs;
+
+            interface IActivatedEventArgs;
+
+            runtimeclass LaunchActivatedEventArgs;
+
+            runtimeclass SearchActivatedEventArgs;
+
+            runtimeclass ShareTargetActivatedEventArgs;
+        }
+    }
+}
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace Core
+        {
+            interface IFrameworkView;
+
+            interface IFrameworkViewSource;
+        }
+    }
+}
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace DataTransfer
+        {
+            runtimeclass DataPackage;
+
+            typedef enum DataPackageOperation DataPackageOperation;
+
+            runtimeclass DataPackageView;
+        }
+    }
+}
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace DataTransfer
+        {
+            namespace DragDrop
+            {
+                typedef enum DragDropModifiers DragDropModifiers;
+            }
+        }
+    }
+}
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        runtimeclass EnteredBackgroundEventArgs;
+
+        runtimeclass LeavingBackgroundEventArgs;
+
+        runtimeclass SuspendingEventArgs;
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        namespace Numerics
+        {
+            typedef struct Matrix4x4 Matrix4x4;
+
+            typedef struct Vector2 Vector2;
+
+            typedef struct Vector3 Vector3;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct Point Point;
+
+        typedef struct Rect Rect;
+
+        typedef struct Size Size;
+
+        typedef struct TimeSpan TimeSpan;
+
+        runtimeclass Uri;
+    }
+}
+namespace Windows
+{
+    namespace Graphics
+    {
+        namespace Imaging
+        {
+            runtimeclass SoftwareBitmap;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Core
+        {
+            runtimeclass CoreDispatcher;
+
+            runtimeclass CoreWindow;
+        }
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            namespace Interop
+            {
+                typedef struct TypeName TypeName;
+            }
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

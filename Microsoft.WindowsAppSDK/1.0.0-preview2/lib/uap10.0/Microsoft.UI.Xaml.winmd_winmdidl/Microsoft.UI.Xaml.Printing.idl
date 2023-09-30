@@ -25,6 +25,18 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace Graphics
+    {
+        namespace Printing
+        {
+            interface IPrintDocumentSource;
+
+            runtimeclass PrintTaskOptions;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

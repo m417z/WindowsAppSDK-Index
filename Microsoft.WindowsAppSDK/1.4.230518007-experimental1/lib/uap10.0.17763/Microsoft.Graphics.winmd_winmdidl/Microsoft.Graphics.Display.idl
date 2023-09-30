@@ -20,6 +20,25 @@ namespace Microsoft
         apicontract WindowsAppSDKContract;
     }
 }
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IClosable;
+
+        typedef struct Point Point;
+    }
+}
+namespace Windows
+{
+    namespace Storage
+    {
+        namespace Streams
+        {
+            interface IRandomAccessStream;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace Graphics

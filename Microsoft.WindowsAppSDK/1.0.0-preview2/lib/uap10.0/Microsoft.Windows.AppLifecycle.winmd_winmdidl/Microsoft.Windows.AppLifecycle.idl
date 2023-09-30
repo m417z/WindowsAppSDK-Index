@@ -8,6 +8,13 @@ import "EventToken.idl";
 import "Windows.Foundation.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IAsyncAction;
+    }
+}
 namespace Microsoft
 {
     namespace Windows

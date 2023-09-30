@@ -41,6 +41,41 @@ namespace Microsoft
         }
     }
 }
+namespace Windows
+{
+    namespace ApplicationModel
+    {
+        namespace DataTransfer
+        {
+            runtimeclass DataPackage;
+
+            typedef enum DataPackageOperation DataPackageOperation;
+
+            runtimeclass DataPackageView;
+        }
+    }
+}
+namespace Windows
+{
+    namespace Foundation
+    {
+        interface IAsyncAction;
+
+        interface IClosable;
+
+        typedef struct Point Point;
+    }
+}
+namespace Windows
+{
+    namespace Graphics
+    {
+        namespace Imaging
+        {
+            runtimeclass SoftwareBitmap;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI

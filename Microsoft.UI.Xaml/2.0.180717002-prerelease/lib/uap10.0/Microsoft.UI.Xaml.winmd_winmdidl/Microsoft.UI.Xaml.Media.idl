@@ -11,6 +11,34 @@ import "Windows.UI.Xaml.idl";
 import "Windows.UI.Xaml.Media.idl";
 
 // Forward Declare
+namespace Windows
+{
+    namespace Foundation
+    {
+        typedef struct TimeSpan TimeSpan;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        typedef struct Color Color;
+    }
+}
+namespace Windows
+{
+    namespace UI
+    {
+        namespace Xaml
+        {
+            typedef enum ApplicationTheme ApplicationTheme;
+
+            runtimeclass DependencyProperty;
+
+            runtimeclass UIElement;
+        }
+    }
+}
 namespace Microsoft
 {
     namespace UI
