@@ -50,13 +50,13 @@ def get_nuget_package_versions(package_name: str):
     return [x.attrib['href'] for x in links]
 
 
-def index_nuget_package_version(url: str, dir: Path, package_deps: dict):
-    print(f'  Downloading {url}...')
+def index_nuget_package_version(package_url: str, dir: Path, package_deps: dict):
+    print(f'  Downloading {package_url}...')
 
-    assert url.startswith('https://www.nuget.org/packages/'), url
+    assert package_url.startswith('https://www.nuget.org/packages/'), package_url
 
     download_url = ('https://www.nuget.org/api/v2/package/' +
-                    url.removeprefix('https://www.nuget.org/packages/'))
+                    package_url.removeprefix('https://www.nuget.org/packages/'))
 
     zip_path = download_file(download_url, dir)
 
@@ -74,7 +74,7 @@ def index_nuget_package_version(url: str, dir: Path, package_deps: dict):
     if lib_dir.exists():
         print(f'  Running cppwinrt...')
 
-        cmd = [CPPWINRT_PATH]
+        cmd = [CPPWINRT_PATH, '-ref', '10.0.22621.0']
 
         for path in lib_dir.iterdir():
             if path.is_dir():
@@ -101,21 +101,20 @@ def index_nuget_package_version(url: str, dir: Path, package_deps: dict):
 
 
 def index_nuget_package(package_name: str, package_deps: dict):
-    packages = get_nuget_package_versions(package_name)
+    package_urls = get_nuget_package_versions(package_name)
 
-    prefix = 'https://www.nuget.org/packages/'
-    assert all(x.startswith(prefix) for x in packages), packages
+    package_url_prefix = 'https://www.nuget.org/packages/'
 
-    paths = [Path(x.removeprefix(prefix)) for x in packages]
-
-    for path, package in zip(paths, packages):
+    for package_url in package_urls:
+        assert package_url.startswith(package_url_prefix), package_url
+        path = Path(package_url.removeprefix(package_url_prefix))
         if path.exists():
             continue
 
-        print(f'Indexing {package}...')
+        print(f'Indexing {package_url}...')
 
         path.mkdir(parents=True, exist_ok=True)
-        index_nuget_package_version(package, path, package_deps)
+        index_nuget_package_version(package_url, path, package_deps)
 
 
 def main():
