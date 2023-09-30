@@ -14,6 +14,9 @@ PACKAGE_NAMES_TO_INDEX = [
 # WINMDIDL_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\winmdidl.exe'
 WINMDIDL_PATH = R'winmdidl.exe'
 
+# CPPWINRT_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\cppwinrt.exe'
+CPPWINRT_PATH = R'cppwinrt.exe'
+
 
 def download_file(url: str, dir: Path):
     # https://stackoverflow.com/a/39217788
@@ -61,6 +64,20 @@ def index_nuget_package_version(url: str, dir: Path):
 
     zip_path.unlink()
 
+    lib_dir = dir / 'lib'
+    if lib_dir.exists():
+        print(f'  Running cppwinrt...')
+
+        cmd = [CPPWINRT_PATH]
+
+        for path in lib_dir.iterdir():
+            if path.is_dir():
+                cmd += ['-in', str(path)]
+
+        cmd += ['-in', 'local', '-out', str(lib_dir)]
+
+        subprocess.check_call(cmd)
+
     print(f'  Running winmdidl...')
 
     for path in dir.glob('**/*.winmd'):
@@ -70,7 +87,7 @@ def index_nuget_package_version(url: str, dir: Path):
         path.unlink()
 
     # Make sure the folder is not empty, otherwise it won't be committed.
-    if not any(dir.iterdir()):
+    if not any(p.is_file() for p in dir.rglob('*')):
         (dir / '.empty').touch()
 
 
