@@ -1,3 +1,4 @@
+import os
 import shutil
 import subprocess
 import xml.etree.ElementTree as ET
@@ -10,7 +11,10 @@ PACKAGES_TO_INDEX = [{
     'name': 'Microsoft.UI.Xaml',
     'deps': {
         'cppwinrt': [
-            str(Path(__file__).parent / 'Microsoft.Web.WebView2.Core-1.0.2045.28.winmd')
+            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib')
+        ],
+        'winmdidl': [
+            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib')
         ],
     }
 }, {
@@ -89,9 +93,13 @@ def index_nuget_package_version(package_url: str, dir: Path, package_deps: dict)
 
     print(f'  Running winmdidl...')
 
+    cmd_start = [WINMDIDL_PATH, Rf'/metadata_dir:{os.environ["SystemRoot"]}\system32\WinMetadata']
+    for dep in package_deps.get('winmdidl', []):
+        cmd_start += [f'/metadata_dir:{dep}']
+
     for path in dir.glob('**/*.winmd'):
         outdir = str(path) + '_winmdidl'
-        cmd = [WINMDIDL_PATH, path, f'/outdir:{outdir}']
+        cmd = cmd_start + [str(path), f'/outdir:{outdir}']
         subprocess.check_call(cmd)
         path.unlink()
 
