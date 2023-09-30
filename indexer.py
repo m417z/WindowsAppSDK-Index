@@ -111,6 +111,9 @@ def index_nuget_package(package_name: str):
 
 def main():
     for package_name in PACKAGE_NAMES_TO_INDEX:
+        # Temporary.
+        shutil.rmtree(package_name)
+
         index_nuget_package(package_name)
 
 
