@@ -130,9 +130,6 @@ def index_nuget_package(package_name: str, package_deps: dict):
 
 def main():
     for package_details in PACKAGES_TO_INDEX:
-        # Temporary.
-        shutil.rmtree(package_details['name'])
-
         index_nuget_package(
             package_details['name'], package_details.get('deps', {}))
 
