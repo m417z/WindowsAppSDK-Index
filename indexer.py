@@ -21,8 +21,13 @@ PACKAGES_TO_INDEX = [{
     'name': 'Microsoft.WindowsAppSDK',
 }]
 
-# Running cppwinrt makes the repository much larger (from 200MB to 8.5GB). It
-# can be run locally if needed.
+# Set to None to index all versions.
+NUM_OF_PACKAGES_TO_INDEX = None
+
+REMOVE_OLD_PACKAGES = False
+
+# Running cppwinrt on all versions makes the repository much larger (from 200MB
+# to 8.5GB). It can be run locally if needed.
 CPPWINRT_RUN = False
 
 # WINMDIDL_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\winmdidl.exe'
@@ -114,10 +119,13 @@ def index_nuget_package_version(package_url: str, dir: Path, package_deps: dict)
 def index_nuget_package(package_name: str, package_deps: dict):
     package_urls = get_nuget_package_versions(package_name)
 
+    if NUM_OF_PACKAGES_TO_INDEX is not None:
+        package_urls = package_urls[:NUM_OF_PACKAGES_TO_INDEX]
+
     package_url_prefix = 'https://www.nuget.org/packages/'
 
     for package_url in package_urls:
-        assert package_url.startswith(package_url_prefix), package_url
+        assert package_url.startswith(f'{package_url_prefix}{package_name}/'), package_url
         path = Path(package_url.removeprefix(package_url_prefix))
         if path.exists():
             continue
@@ -126,6 +134,17 @@ def index_nuget_package(package_name: str, package_deps: dict):
 
         path.mkdir(parents=True, exist_ok=True)
         index_nuget_package_version(package_url, path, package_deps)
+
+    if REMOVE_OLD_PACKAGES:
+        for path in Path(package_name).iterdir():
+            if not path.is_dir():
+                continue
+
+            if f'{package_url_prefix}{package_name}/{path.name}' in package_urls:
+                continue
+
+            print(f'Removing {path}...')
+            shutil.rmtree(path)
 
 
 def main():
