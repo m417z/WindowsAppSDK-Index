@@ -26,3 +26,7 @@ IInspectable"`](https://github.com/search?q=repo%3Am417z%2FWindowsAppSDK-Index+%
 For a more powerful experience, you can use [the github.dev
 version](https://github.dev/m417z/WindowsAppSDK-Index) or, of course, clone the
 repository.
+
+## See also
+
+* [WindowsAppSDK-Headers](https://github.com/m417z/WindowsAppSDK-Headers)
