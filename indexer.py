@@ -11,14 +11,22 @@ PACKAGES_TO_INDEX = [{
     'name': 'Microsoft.UI.Xaml',
     'deps': {
         'cppwinrt': [
-            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib')
+            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib'),
         ],
         'winmdidl': [
-            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib')
+            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib'),
         ],
-    }
+    },
 }, {
     'name': 'Microsoft.WindowsAppSDK',
+    'deps': {
+        'cppwinrt': [
+            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib'),
+        ],
+        'winmdidl': [
+            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib'),
+        ],
+    },
 }]
 
 # Set to None to index all versions.
