@@ -30,7 +30,8 @@ PACKAGES_TO_INDEX = [{
 }]
 
 # Set to None to index all versions.
-NUM_OF_PACKAGES_TO_INDEX = None
+NUM_OF_PACKAGES_TO_INDEX_PREVIEW = None
+NUM_OF_PACKAGES_TO_INDEX_STABLE = None
 
 REMOVE_OLD_PACKAGES = False
 
@@ -39,10 +40,12 @@ REMOVE_OLD_PACKAGES = False
 CPPWINRT_RUN = False
 
 # WINMDIDL_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\winmdidl.exe'
-WINMDIDL_PATH = R'winmdidl.exe'
+WINMDIDL_PATH = 'winmdidl.exe'
 
 # CPPWINRT_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\cppwinrt.exe'
-CPPWINRT_PATH = R'cppwinrt.exe'
+CPPWINRT_PATH = 'cppwinrt.exe'
+
+WINMETADATA_PATH = str(Path(__file__).parent / 'WinMetadata/10.0.26100.2605')
 
 
 def download_file(url: str, dir: Path):
@@ -94,22 +97,32 @@ def index_nuget_package_version(package_url: str, dir: Path, package_deps: dict)
     if CPPWINRT_RUN and (lib_dir := dir / 'lib') and lib_dir.exists():
         print(f'  Running cppwinrt...')
 
-        cmd = [CPPWINRT_PATH, '-ref', '10.0.22621.0']
+        cppwinrt_dir = os.environ.get('CPPWINRT_DIR')
+        if cppwinrt_dir:
+            cppwinrt_exe = list(Path(cppwinrt_dir).glob('Microsoft.Windows.CppWinRT.*/bin/cppwinrt.exe'))
+            if len(cppwinrt_exe) != 1:
+                raise RuntimeError(f'Expected 1 cppwinrt.exe, found: {cppwinrt_exe}')
+
+            cppwinrt_path = cppwinrt_exe[0]
+        else:
+            cppwinrt_path = CPPWINRT_PATH
+
+        cmd = [cppwinrt_path, '-input', WINMETADATA_PATH]
 
         for path in lib_dir.iterdir():
             if path.is_dir():
-                cmd += ['-in', str(path)]
+                cmd += ['-input', str(path)]
 
         for dep in package_deps.get('cppwinrt', []):
-            cmd += ['-in', dep]
+            cmd += ['-input', dep]
 
-        cmd += ['-in', 'local', '-out', str(lib_dir)]
+        cmd += ['-output', str(lib_dir)]
 
         subprocess.check_call(cmd)
 
     print(f'  Running winmdidl...')
 
-    cmd_start = [WINMDIDL_PATH, Rf'/metadata_dir:{os.environ["SystemRoot"]}\system32\WinMetadata']
+    cmd_start = [WINMDIDL_PATH, f'/metadata_dir:{WINMETADATA_PATH}']
     for dep in package_deps.get('winmdidl', []):
         cmd_start += [f'/metadata_dir:{dep}']
 
@@ -127,12 +140,25 @@ def index_nuget_package_version(package_url: str, dir: Path, package_deps: dict)
 def index_nuget_package(package_name: str, package_deps: dict):
     package_urls = get_nuget_package_versions(package_name)
 
-    if NUM_OF_PACKAGES_TO_INDEX is not None:
-        package_urls = package_urls[:NUM_OF_PACKAGES_TO_INDEX]
+    if (NUM_OF_PACKAGES_TO_INDEX_PREVIEW is not None or
+        NUM_OF_PACKAGES_TO_INDEX_STABLE is not None):
+        def is_preview(url: str):
+            return '-' in url.split('/')[-1]
+
+        package_urls_preview = list(filter(is_preview, package_urls))
+        package_urls_stable = list(filter(lambda url: not is_preview(url), package_urls))
+
+        if NUM_OF_PACKAGES_TO_INDEX_PREVIEW is not None:
+            package_urls_preview = package_urls_preview[:NUM_OF_PACKAGES_TO_INDEX_PREVIEW]
+
+        if NUM_OF_PACKAGES_TO_INDEX_STABLE is not None:
+            package_urls_stable = package_urls_stable[:NUM_OF_PACKAGES_TO_INDEX_STABLE]
+
+        package_urls = package_urls_preview + package_urls_stable
 
     package_url_prefix = 'https://www.nuget.org/packages/'
 
-    for package_url in package_urls:
+    for package_url in sorted(package_urls):
         assert package_url.startswith(f'{package_url_prefix}{package_name}/'), package_url
         path = Path(package_url.removeprefix(package_url_prefix))
         if path.exists():
