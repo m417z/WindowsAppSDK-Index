@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
@@ -9,24 +10,8 @@ import requests
 
 PACKAGES_TO_INDEX = [{
     'name': 'Microsoft.UI.Xaml',
-    'deps': {
-        'cppwinrt': [
-            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib'),
-        ],
-        'winmdidl': [
-            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib'),
-        ],
-    },
 }, {
     'name': 'Microsoft.WindowsAppSDK',
-    'deps': {
-        'cppwinrt': [
-            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib'),
-        ],
-        'winmdidl': [
-            str(Path(__file__).parent / 'deps/Microsoft.Web.WebView2.Core/1.0.2045.28/lib'),
-        ],
-    },
 }]
 
 # Set to None to index all versions.
@@ -39,10 +24,10 @@ REMOVE_OLD_PACKAGES = False
 # to 8.5GB). It can be run locally if needed.
 CPPWINRT_RUN = False
 
-# WINMDIDL_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\winmdidl.exe'
+# WINMDIDL_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\winmdidl.exe'
 WINMDIDL_PATH = 'winmdidl.exe'
 
-# CPPWINRT_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\cppwinrt.exe'
+# CPPWINRT_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\cppwinrt.exe'
 CPPWINRT_PATH = 'cppwinrt.exe'
 
 WINMETADATA_PATH = str(Path(__file__).parent / 'WinMetadata/10.0.26100.2605')
@@ -52,6 +37,7 @@ def download_file(url: str, dir: Path):
     # https://stackoverflow.com/a/39217788
     target_path = dir / url.split('/')[-1]
     with requests.get(url, stream=True) as r:
+        r.raise_for_status()
         with target_path.open('wb') as f:
             shutil.copyfileobj(r.raw, f)
 
@@ -74,27 +60,128 @@ def get_nuget_package_versions(package_name: str):
     return [x.attrib['href'] for x in links]
 
 
-def index_nuget_package_version(package_url: str, dir: Path, package_deps: dict):
-    print(f'  Downloading {package_url}...')
+def parse_nuget_version(version_string: str) -> str:
+    """Parse NuGet version notation and extract the specific version.
 
-    assert package_url.startswith('https://www.nuget.org/packages/'), package_url
+    Returns as-is if no brackets. If brackets, extracts first version from range.
+    Raises ValueError for exclusive ranges (parentheses) or malformed input.
+    """
+    version_string = version_string.strip()
 
-    download_url = ('https://www.nuget.org/api/v2/package/' +
-                    package_url.removeprefix('https://www.nuget.org/packages/'))
+    # No brackets - return as-is
+    if not version_string.startswith(('[', '(')):
+        return version_string
 
-    zip_path = download_file(download_url, dir)
+    # Reject exclusive range notations
+    if version_string.startswith('('):
+        raise ValueError(f'Exclusive range notation not supported: {version_string}')
 
-    print(f'  Unzipping to {dir}...')
+    # Must have closing bracket
+    if not version_string.endswith((']', ')')):
+        raise ValueError(f'Invalid version notation, missing closing bracket: {version_string}')
 
-    extensions = ('.c', '.cpp', '.h', '.idl', '.winmd')
+    # Extract first version from range
+    min_version = version_string[1:-1].split(',')[0].strip()
+    if not min_version:
+        raise ValueError(f'Unsupported version notation, missing minimum version: {version_string}')
+
+    return min_version
+
+
+def extract_dependencies_from_nuspec(nuspec_path: Path):
+    """Extract dependencies from a .nuspec file."""
+    tree = ET.parse(nuspec_path)
+    root = tree.getroot()
+
+    # Extract namespace from root element (must be present)
+    # Format: {http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd}package
+    if not root.tag.startswith('{') or not root.tag.endswith('}package'):
+        raise ValueError(f'Root element in {nuspec_path} missing namespace: {root.tag}')
+
+    namespace = root.tag.removeprefix('{').removesuffix('}package')
+
+    # Find metadata element
+    metadata = root.find(f'{{{namespace}}}metadata')
+    if metadata is None:
+        raise RuntimeError(f'No metadata element found in {nuspec_path}')
+
+    # Find dependencies container
+    dependencies_container = metadata.find(f'{{{namespace}}}dependencies')
+    if dependencies_container is None:
+        return []
+
+    dependencies = []
+    seen = set()  # Track seen dependencies to avoid duplicates
+
+    # Find all dependency elements
+    dep_elements = dependencies_container.findall(f'{{{namespace}}}dependency')
+
+    for dep in dep_elements:
+        dep_id = dep.attrib.get('id')
+        dep_version_raw = dep.attrib.get('version')
+
+        if not dep_id:
+            raise ValueError(f'Dependency in {nuspec_path} is missing "id" attribute')
+        if not dep_version_raw:
+            raise ValueError(f'Dependency in {nuspec_path} is missing "version" attribute')
+
+        # Parse the version notation
+        dep_version = parse_nuget_version(dep_version_raw)
+
+        # Check for duplicates
+        dep_key = (dep_id, dep_version)
+        if dep_key not in seen:
+            seen.add(dep_key)
+            dependencies.append({'id': dep_id, 'version': dep_version})
+
+    return dependencies
+
+
+def process_package(package_id: str, package_version: str, package_dir: Path, deps_dir: Path, used_deps: set):
+    """Download, extract, and process a NuGet package (main or dependency)."""
+    print(f'  Downloading {package_id} {package_version}...')
+
+    download_url = f'https://www.nuget.org/api/v2/package/{package_id}/{package_version}'
+    zip_path = download_file(download_url, package_dir)
+
+    print(f'  Unzipping to {package_dir}...')
+
+    extensions = ('.c', '.cpp', '.h', '.idl', '.winmd', '.nuspec')
     with zipfile.ZipFile(zip_path, 'r') as zip_file:
         for name in zip_file.namelist():
             if name.endswith(extensions):
-                zip_file.extract(name, dir)
+                zip_file.extract(name, package_dir)
 
     zip_path.unlink()
 
-    if CPPWINRT_RUN and (lib_dir := dir / 'lib') and lib_dir.exists():
+    # Process dependencies recursively
+    nuspec_file = package_dir / f'{package_id}.nuspec'
+    if not nuspec_file.exists():
+        raise RuntimeError(f'Expected .nuspec file not found: {nuspec_file}')
+
+    package_deps = []
+
+    print(f'  Processing dependencies...')
+    dependencies = extract_dependencies_from_nuspec(nuspec_file)
+
+    for dep in dependencies:
+        dep_dir = deps_dir / dep['id'] / dep['version']
+        dep_key = (dep['id'], dep['version'])
+
+        # Track this dependency as used
+        used_deps.add(dep_key)
+
+        # Process dependency if it doesn't exist
+        if not dep_dir.exists():
+            dep_dir.mkdir(parents=True, exist_ok=True)
+            process_package(dep['id'], dep['version'], dep_dir, deps_dir, used_deps)
+
+        # Add this dependency's lib path
+        lib_dir = dep_dir / 'lib'
+        if lib_dir.exists():
+            package_deps.append(str(lib_dir))
+
+    if CPPWINRT_RUN and (lib_dir := package_dir / 'lib') and lib_dir.exists():
         print(f'  Running cppwinrt...')
 
         cppwinrt_dir = os.environ.get('CPPWINRT_DIR')
@@ -113,31 +200,41 @@ def index_nuget_package_version(package_url: str, dir: Path, package_deps: dict)
             if path.is_dir():
                 cmd += ['-input', str(path)]
 
-        for dep in package_deps.get('cppwinrt', []):
+        for dep in package_deps:
             cmd += ['-input', dep]
 
         cmd += ['-output', str(lib_dir)]
 
+        print(f'  Command: {cmd}')
         subprocess.check_call(cmd)
 
     print(f'  Running winmdidl...')
 
     cmd_start = [WINMDIDL_PATH, f'/metadata_dir:{WINMETADATA_PATH}']
-    for dep in package_deps.get('winmdidl', []):
+    for dep in package_deps:
         cmd_start += [f'/metadata_dir:{dep}']
 
-    for path in dir.glob('**/*.winmd'):
-        outdir = str(path) + '_winmdidl'
-        cmd = cmd_start + [str(path), f'/outdir:{outdir}']
-        subprocess.check_call(cmd)
+    for path in package_dir.glob('**/*.winmd'):
+        # Use a temp directory to avoid long path issues
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_outdir = Path(temp_dir) / 'w'
+            cmd = cmd_start + [str(path), f'/outdir:{temp_outdir}']
+            print(f'  Command: {cmd}')
+            subprocess.check_call(cmd)
+
+            # Move output from temp dir to final location
+            final_outdir = Path(str(path) + '_winmdidl')
+            final_outdir.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(temp_outdir, final_outdir)
+
         path.unlink()
 
     # Make sure the folder is not empty, otherwise it won't be committed.
-    if not any(p.is_file() for p in dir.rglob('*')):
-        (dir / '.empty').touch()
+    if not any(p.is_file() for p in package_dir.rglob('*')):
+        (package_dir / '.empty').touch()
 
 
-def index_nuget_package(package_name: str, package_deps: dict):
+def index_nuget_package(package_name: str):
     package_urls = get_nuget_package_versions(package_name)
 
     if (NUM_OF_PACKAGES_TO_INDEX_PREVIEW is not None or
@@ -158,20 +255,27 @@ def index_nuget_package(package_name: str, package_deps: dict):
 
     package_url_prefix = 'https://www.nuget.org/packages/'
 
+    # Shared dependencies directory for all versions of this package
+    package_deps_dir = Path(package_name) / 'deps'
+
+    # Track all dependencies used across all package versions
+    used_deps = set()
+
     for package_url in sorted(package_urls):
         assert package_url.startswith(f'{package_url_prefix}{package_name}/'), package_url
-        path = Path(package_url.removeprefix(package_url_prefix))
-        if path.exists():
+        version_path = Path(package_url.removeprefix(package_url_prefix))
+        if version_path.exists():
             continue
 
         print(f'Indexing {package_url}...')
 
-        path.mkdir(parents=True, exist_ok=True)
-        index_nuget_package_version(package_url, path, package_deps)
+        package_version = version_path.name
+        version_path.mkdir(parents=True, exist_ok=True)
+        process_package(package_name, package_version, version_path, package_deps_dir, used_deps)
 
     if REMOVE_OLD_PACKAGES:
         for path in Path(package_name).iterdir():
-            if not path.is_dir():
+            if not path.is_dir() or path.name == 'deps':
                 continue
 
             if f'{package_url_prefix}{package_name}/{path.name}' in package_urls:
@@ -180,11 +284,25 @@ def index_nuget_package(package_name: str, package_deps: dict):
             print(f'Removing {path}...')
             shutil.rmtree(path)
 
+        # Remove unused dependencies
+        if package_deps_dir.exists():
+            for dep_id_dir in package_deps_dir.iterdir():
+                if not dep_id_dir.is_dir():
+                    continue
+
+                for dep_version_dir in dep_id_dir.iterdir():
+                    if not dep_version_dir.is_dir():
+                        continue
+
+                    dep_key = (dep_id_dir.name, dep_version_dir.name)
+                    if dep_key not in used_deps:
+                        print(f'Removing unused dependency {dep_id_dir.name}/{dep_version_dir.name}...')
+                        shutil.rmtree(dep_version_dir)
+
 
 def main():
     for package_details in PACKAGES_TO_INDEX:
-        index_nuget_package(
-            package_details['name'], package_details.get('deps', {}))
+        index_nuget_package(package_details['name'])
 
 
 if __name__ == '__main__':
