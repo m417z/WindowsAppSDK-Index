@@ -232,7 +232,8 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
             final_outdir.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(temp_outdir, final_outdir)
 
-        path.unlink()
+        if not config.WINMD_FILES_KEEP:
+            path.unlink()
 
     # Make sure the folder is not empty, otherwise it won't be committed.
     if not any(p.is_file() for p in package_dir.rglob('*')):
