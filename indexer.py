@@ -156,12 +156,12 @@ def collect_all_dependencies(nuspec_path: Path, deps_dir: Path, collected: Optio
 
 def process_package(package_id: str, package_version: str, package_dir: Path, deps_dir: Path):
     """Download, extract, and process a NuGet package (main or dependency)."""
-    print(f'  Downloading {package_id} {package_version}...')
+    print(f'Downloading {package_id} {package_version}...')
 
     download_url = f'https://www.nuget.org/api/v2/package/{package_id}/{package_version}'
     zip_path = download_file(download_url, package_dir)
 
-    print(f'  Unzipping to {package_dir}...')
+    print(f'Unzipping to {package_dir}...')
 
     extensions = ('.c', '.cpp', '.h', '.idl', '.winmd', '.nuspec')
     with zipfile.ZipFile(zip_path, 'r') as zip_file:
@@ -176,7 +176,7 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
     if not nuspec_file.exists():
         raise RuntimeError(f'Expected .nuspec file not found: {nuspec_file}')
 
-    print(f'  Processing dependencies...')
+    print(f'Processing dependencies...')
     dependencies = extract_dependencies_from_nuspec(nuspec_file)
 
     for dep in dependencies:
@@ -204,80 +204,20 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
                 else:
                     raise
 
-                print(f'    Dependency {dep["id"]} {prev_version} not found, trying {dep["version"]}...')
+                print(f'Dependency {dep["id"]} {prev_version} not found, trying {dep["version"]}...')
                 dep_dir = deps_dir / dep['id'] / dep['version']
                 if not dep_dir.exists():
                     dep_dir.mkdir(parents=True, exist_ok=True)
                     process_package(dep['id'], dep['version'], dep_dir, deps_dir)
 
-    package_deps = []
-
-    dependencies = collect_all_dependencies(nuspec_file, deps_dir)
-    for dep_id, dep_version in dependencies:
-        dep_dir = deps_dir / dep_id / dep_version
-
-        # Add this dependency's lib path
-        lib_dir = dep_dir / 'lib'
-        if lib_dir.exists():
-            package_deps.append(lib_dir)
-            package_deps.extend(x for x in lib_dir.iterdir() if x.is_dir())
-
-        metadata_dir = dep_dir / 'metadata'
-        if metadata_dir.exists():
-            package_deps.append(metadata_dir)
-            package_deps.extend(x for x in metadata_dir.iterdir() if x.is_dir())
-
-    cppwinrt_inputs = []
-
-    lib_dir = package_dir / 'lib'
-    if lib_dir.exists():
-        cppwinrt_inputs.append(lib_dir)
-        cppwinrt_inputs.extend(x for x in lib_dir.iterdir() if x.is_dir())
-
-    metadata_dir = package_dir / 'metadata'
-    if metadata_dir.exists():
-        cppwinrt_inputs.append(metadata_dir)
-        cppwinrt_inputs.extend(x for x in metadata_dir.iterdir() if x.is_dir())
-
-    if cppwinrt_inputs and config.CPPWINRT_RUN:
-        print(f'  Running cppwinrt...')
-
-        cppwinrt_dir = os.environ.get('CPPWINRT_DIR')
-        if cppwinrt_dir:
-            cppwinrt_exe = list(Path(cppwinrt_dir).glob('Microsoft.Windows.CppWinRT.*/bin/cppwinrt.exe'))
-            if len(cppwinrt_exe) != 1:
-                raise RuntimeError(f'Expected 1 cppwinrt.exe, found: {cppwinrt_exe}')
-
-            cppwinrt_path = cppwinrt_exe[0]
-        else:
-            cppwinrt_path = config.CPPWINRT_PATH
-
-        cmd = [cppwinrt_path, '-input', config.WINMETADATA_PATH]
-
-        for path in cppwinrt_inputs:
-            cmd += ['-input', str(path)]
-
-        for dep in package_deps:
-            cmd += ['-input', str(dep)]
-
-        output_dir = package_dir / 'cppwinrt'
-        cmd += ['-output', str(output_dir)]
-
-        print(f'  Command: {cmd}')
-        subprocess.check_call(cmd)
-
-    print(f'  Running winmdidl...')
-
     cmd_start = [config.WINMDIDL_PATH, f'/metadata_dir:{config.WINMETADATA_PATH}']
-    for dep in package_deps:
-        cmd_start += [f'/metadata_dir:{dep}']
 
     for path in package_dir.glob('**/*.winmd'):
         # Use a temp directory to avoid long path issues
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_outdir = Path(temp_dir) / 'w'
             cmd = cmd_start + [str(path), f'/outdir:{temp_outdir}']
-            print(f'  Command: {cmd}')
+            print(f'Running winmdidl: {cmd}')
             subprocess.check_call(cmd)
 
             # Move output from temp dir to final location
@@ -291,6 +231,52 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
     # Make sure the folder is not empty, otherwise it won't be committed.
     if not any(p.is_file() for p in package_dir.rglob('*')):
         (package_dir / '.empty').touch()
+
+
+def run_cppwinrt(package_id: str, package_version: str, package_dir: Path, deps_dir: Path):
+    nuspec_file = package_dir / f'{package_id}.nuspec'
+
+    cppwinrt_inputs_dirs: list[Path] = [
+        package_dir / 'lib',
+        package_dir / 'metadata',
+    ]
+
+    dependencies = collect_all_dependencies(nuspec_file, deps_dir)
+    for dep_id, dep_version in dependencies:
+        dep_dir = deps_dir / dep_id / dep_version
+        cppwinrt_inputs_dirs.append(dep_dir / 'lib')
+        cppwinrt_inputs_dirs.append(dep_dir / 'metadata')
+
+    cppwinrt_inputs = []
+    for cppwinrt_inputs_dir in cppwinrt_inputs_dirs:
+        if cppwinrt_inputs_dir.exists():
+            cppwinrt_inputs.append(cppwinrt_inputs_dir)
+            cppwinrt_inputs.extend(x for x in cppwinrt_inputs_dir.iterdir() if x.is_dir())
+
+    if not cppwinrt_inputs:
+        print(f'No inputs found for cppwinrt, skipping...')
+        return
+
+    cppwinrt_dir = os.environ.get('CPPWINRT_DIR')
+    if cppwinrt_dir:
+        cppwinrt_exe = list(Path(cppwinrt_dir).glob('Microsoft.Windows.CppWinRT.*/bin/cppwinrt.exe'))
+        if len(cppwinrt_exe) != 1:
+            raise RuntimeError(f'Expected 1 cppwinrt.exe, found: {cppwinrt_exe}')
+
+        cppwinrt_path = cppwinrt_exe[0]
+    else:
+        cppwinrt_path = config.CPPWINRT_PATH
+
+    cmd = [cppwinrt_path, '-input', config.WINMETADATA_PATH]
+
+    for path in cppwinrt_inputs:
+        cmd += ['-input', str(path)]
+
+    output_dir = package_dir / 'cppwinrt'
+    cmd += ['-output', str(output_dir)]
+
+    print(f'Running cppwinrt: {cmd}')
+    subprocess.check_call(cmd)
 
 
 def remove_unused_dependencies(package_name: str, package_root_dir: Path):
@@ -365,6 +351,9 @@ def index_nuget_package(package_name: str):
         package_version = version_path.name
         version_path.mkdir(parents=True, exist_ok=True)
         process_package(package_name, package_version, version_path, package_deps_dir)
+
+        if config.CPPWINRT_RUN:
+            run_cppwinrt(package_name, package_version, version_path, package_deps_dir)
 
     if config.REMOVE_OLD_PACKAGES:
         for path in Path(package_name).iterdir():
