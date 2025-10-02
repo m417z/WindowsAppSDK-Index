@@ -166,15 +166,37 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
 
     for dep in dependencies:
         dep_dir = deps_dir / dep['id'] / dep['version']
-        dep_key = (dep['id'], dep['version'])
-
-        # Track this dependency as used
-        used_deps.add(dep_key)
 
         # Process dependency if it doesn't exist
         if not dep_dir.exists():
-            dep_dir.mkdir(parents=True, exist_ok=True)
-            process_package(dep['id'], dep['version'], dep_dir, deps_dir, used_deps)
+            try:
+                dep_dir.mkdir(parents=True, exist_ok=True)
+                process_package(dep['id'], dep['version'], dep_dir, deps_dir, used_deps)
+            except requests.exceptions.HTTPError as e:
+                if e.response.status_code != 404:
+                    raise
+
+                prev_version = dep['version']
+                if dep == {'id': 'Microsoft.WindowsAppSDK.Base', 'version': '1.8.250501001-experimental'}:
+                    dep = {'id': dep['id'], 'version': '1.8.250509001-experimental'}
+                elif dep == {'id': 'Microsoft.WindowsAppSDK.InteractiveExperiences', 'version': '1.8.250506001-experimental'}:
+                    dep = {'id': dep['id'], 'version': '1.8.250509002-experimental'}
+                elif dep in [
+                    {'id': 'Microsoft.WindowsAppSDK.Foundation', 'version': '1.8.0-20250429.5.nightly.internal'},
+                    {'id': 'Microsoft.WindowsAppSDK.Foundation', 'version': '1.8.250504002-experimental'},
+                ]:
+                    dep = {'id': dep['id'], 'version': '1.8.250507001-experimental'}
+                else:
+                    raise
+
+                print(f'    Dependency {dep["id"]} {prev_version} not found, trying {dep["version"]}...')
+                dep_dir = deps_dir / dep['id'] / dep['version']
+                if not dep_dir.exists():
+                    dep_dir.mkdir(parents=True, exist_ok=True)
+                    process_package(dep['id'], dep['version'], dep_dir, deps_dir, used_deps)
+
+        # Track this dependency as used
+        used_deps.add((dep['id'], dep['version']))
 
         # Add this dependency's lib path
         lib_dir = dep_dir / 'lib'
