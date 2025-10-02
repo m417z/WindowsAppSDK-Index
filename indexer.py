@@ -121,6 +121,39 @@ def extract_dependencies_from_nuspec(nuspec_path: Path):
     return dependencies
 
 
+def collect_all_dependencies(nuspec_path: Path, deps_dir: Path, collected: Optional[set] = None):
+    """Recursively collect all dependencies (including transitive ones) from a .nuspec file.
+
+    Args:
+        nuspec_path: Path to the .nuspec file to analyze
+        deps_dir: Directory containing dependency packages
+        collected: Set to track already collected dependencies (to avoid cycles)
+
+    Returns:
+        Set of tuples (dep_id, dep_version) representing all dependencies
+    """
+    if collected is None:
+        collected = set()
+
+    dependencies = extract_dependencies_from_nuspec(nuspec_path)
+
+    for dep in dependencies:
+        dep_key = (dep['id'], dep['version'])
+
+        # Skip if already processed (avoids infinite recursion)
+        if dep_key in collected:
+            continue
+
+        collected.add(dep_key)
+
+        # Recursively collect dependencies of this dependency
+        dep_nuspec = deps_dir / dep['id'] / dep['version'] / f"{dep['id']}.nuspec"
+        if dep_nuspec.exists():
+            collect_all_dependencies(dep_nuspec, deps_dir, collected)
+
+    return collected
+
+
 def process_package(package_id: str, package_version: str, package_dir: Path, deps_dir: Path):
     """Download, extract, and process a NuGet package (main or dependency)."""
     print(f'  Downloading {package_id} {package_version}...')
@@ -142,8 +175,6 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
     nuspec_file = package_dir / f'{package_id}.nuspec'
     if not nuspec_file.exists():
         raise RuntimeError(f'Expected .nuspec file not found: {nuspec_file}')
-
-    package_deps = []
 
     print(f'  Processing dependencies...')
     dependencies = extract_dependencies_from_nuspec(nuspec_file)
@@ -179,24 +210,36 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
                     dep_dir.mkdir(parents=True, exist_ok=True)
                     process_package(dep['id'], dep['version'], dep_dir, deps_dir)
 
+    package_deps = []
+
+    dependencies = collect_all_dependencies(nuspec_file, deps_dir)
+    for dep_id, dep_version in dependencies:
+        dep_dir = deps_dir / dep_id / dep_version
+
         # Add this dependency's lib path
         lib_dir = dep_dir / 'lib'
         if lib_dir.exists():
-            package_deps.append(str(lib_dir))
+            package_deps.append(lib_dir)
+            package_deps.extend(x for x in lib_dir.iterdir() if x.is_dir())
 
-    lib_dirs = [
-        package_dir / 'lib',
-        package_dir / 'metadata',
-    ]
-    lib_dirs = [d for d in lib_dirs if d.exists()]
-    if lib_dirs:
-        if len(lib_dirs) > 1:
-            raise RuntimeError(f'Expected only one lib dir, found: {lib_dirs}')
-        lib_dir = lib_dirs[0]
-    else:
-        lib_dir = None
+        metadata_dir = dep_dir / 'metadata'
+        if metadata_dir.exists():
+            package_deps.append(metadata_dir)
+            package_deps.extend(x for x in metadata_dir.iterdir() if x.is_dir())
 
-    if lib_dir and config.CPPWINRT_RUN:
+    cppwinrt_inputs = []
+
+    lib_dir = package_dir / 'lib'
+    if lib_dir.exists():
+        cppwinrt_inputs.append(lib_dir)
+        cppwinrt_inputs.extend(x for x in lib_dir.iterdir() if x.is_dir())
+
+    metadata_dir = package_dir / 'metadata'
+    if metadata_dir.exists():
+        cppwinrt_inputs.append(metadata_dir)
+        cppwinrt_inputs.extend(x for x in metadata_dir.iterdir() if x.is_dir())
+
+    if cppwinrt_inputs and config.CPPWINRT_RUN:
         print(f'  Running cppwinrt...')
 
         cppwinrt_dir = os.environ.get('CPPWINRT_DIR')
@@ -211,14 +254,14 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
 
         cmd = [cppwinrt_path, '-input', config.WINMETADATA_PATH]
 
-        for path in lib_dir.iterdir():
-            if path.is_dir():
-                cmd += ['-input', str(path)]
+        for path in cppwinrt_inputs:
+            cmd += ['-input', str(path)]
 
         for dep in package_deps:
-            cmd += ['-input', dep]
+            cmd += ['-input', str(dep)]
 
-        cmd += ['-output', str(lib_dir)]
+        output_dir = package_dir / 'cppwinrt'
+        cmd += ['-output', str(output_dir)]
 
         print(f'  Command: {cmd}')
         subprocess.check_call(cmd)
@@ -248,39 +291,6 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
     # Make sure the folder is not empty, otherwise it won't be committed.
     if not any(p.is_file() for p in package_dir.rglob('*')):
         (package_dir / '.empty').touch()
-
-
-def collect_all_dependencies(nuspec_path: Path, deps_dir: Path, collected: Optional[set] = None):
-    """Recursively collect all dependencies (including transitive ones) from a .nuspec file.
-
-    Args:
-        nuspec_path: Path to the .nuspec file to analyze
-        deps_dir: Directory containing dependency packages
-        collected: Set to track already collected dependencies (to avoid cycles)
-
-    Returns:
-        Set of tuples (dep_id, dep_version) representing all dependencies
-    """
-    if collected is None:
-        collected = set()
-
-    dependencies = extract_dependencies_from_nuspec(nuspec_path)
-
-    for dep in dependencies:
-        dep_key = (dep['id'], dep['version'])
-
-        # Skip if already processed (avoids infinite recursion)
-        if dep_key in collected:
-            continue
-
-        collected.add(dep_key)
-
-        # Recursively collect dependencies of this dependency
-        dep_nuspec = deps_dir / dep['id'] / dep['version'] / f"{dep['id']}.nuspec"
-        if dep_nuspec.exists():
-            collect_all_dependencies(dep_nuspec, deps_dir, collected)
-
-    return collected
 
 
 def remove_unused_dependencies(package_name: str, package_root_dir: Path):
