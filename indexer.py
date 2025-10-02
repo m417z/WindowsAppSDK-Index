@@ -5,6 +5,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
+from typing import Optional
 
 import requests
 
@@ -120,7 +121,7 @@ def extract_dependencies_from_nuspec(nuspec_path: Path):
     return dependencies
 
 
-def process_package(package_id: str, package_version: str, package_dir: Path, deps_dir: Path, used_deps: set):
+def process_package(package_id: str, package_version: str, package_dir: Path, deps_dir: Path):
     """Download, extract, and process a NuGet package (main or dependency)."""
     print(f'  Downloading {package_id} {package_version}...')
 
@@ -154,7 +155,7 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
         if not dep_dir.exists():
             try:
                 dep_dir.mkdir(parents=True, exist_ok=True)
-                process_package(dep['id'], dep['version'], dep_dir, deps_dir, used_deps)
+                process_package(dep['id'], dep['version'], dep_dir, deps_dir)
             except requests.exceptions.HTTPError as e:
                 if e.response.status_code != 404:
                     raise
@@ -176,10 +177,7 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
                 dep_dir = deps_dir / dep['id'] / dep['version']
                 if not dep_dir.exists():
                     dep_dir.mkdir(parents=True, exist_ok=True)
-                    process_package(dep['id'], dep['version'], dep_dir, deps_dir, used_deps)
-
-        # Track this dependency as used
-        used_deps.add((dep['id'], dep['version']))
+                    process_package(dep['id'], dep['version'], dep_dir, deps_dir)
 
         # Add this dependency's lib path
         lib_dir = dep_dir / 'lib'
@@ -240,6 +238,76 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
         (package_dir / '.empty').touch()
 
 
+def collect_all_dependencies(nuspec_path: Path, deps_dir: Path, collected: Optional[set] = None):
+    """Recursively collect all dependencies (including transitive ones) from a .nuspec file.
+
+    Args:
+        nuspec_path: Path to the .nuspec file to analyze
+        deps_dir: Directory containing dependency packages
+        collected: Set to track already collected dependencies (to avoid cycles)
+
+    Returns:
+        Set of tuples (dep_id, dep_version) representing all dependencies
+    """
+    if collected is None:
+        collected = set()
+
+    dependencies = extract_dependencies_from_nuspec(nuspec_path)
+
+    for dep in dependencies:
+        dep_key = (dep['id'], dep['version'])
+
+        # Skip if already processed (avoids infinite recursion)
+        if dep_key in collected:
+            continue
+
+        collected.add(dep_key)
+
+        # Recursively collect dependencies of this dependency
+        dep_nuspec = deps_dir / dep['id'] / dep['version'] / f"{dep['id']}.nuspec"
+        if dep_nuspec.exists():
+            collect_all_dependencies(dep_nuspec, deps_dir, collected)
+
+    return collected
+
+
+def remove_unused_dependencies(package_name: str, package_root_dir: Path):
+    """Remove dependencies that are not used by any package version.
+
+    Args:
+        package_root_dir: Root directory containing all package versions
+        package_deps_dir: Directory containing all dependencies
+    """
+    package_deps_dir = package_root_dir / 'deps'
+    if not package_deps_dir.exists():
+        return
+
+    # Collect all dependencies actually used by all package versions
+    all_used_deps = set()
+    for package_version_dir in package_root_dir.iterdir():
+        if not package_version_dir.is_dir() or package_version_dir.name == 'deps':
+            continue
+
+        # Construct the .nuspec file path using the package name
+        nuspec_file = package_version_dir / f'{package_name}.nuspec'
+        version_deps = collect_all_dependencies(nuspec_file, package_deps_dir)
+        all_used_deps.update(version_deps)
+
+    # Remove dependencies that are not in the used set
+    for dep_id_dir in package_deps_dir.iterdir():
+        if not dep_id_dir.is_dir():
+            continue
+
+        for dep_version_dir in dep_id_dir.iterdir():
+            if not dep_version_dir.is_dir():
+                continue
+
+            dep_key = (dep_id_dir.name, dep_version_dir.name)
+            if dep_key not in all_used_deps:
+                print(f'Removing unused dependency {dep_id_dir.name}/{dep_version_dir.name}...')
+                shutil.rmtree(dep_version_dir)
+
+
 def index_nuget_package(package_name: str):
     package_urls = get_nuget_package_versions(package_name)
 
@@ -264,9 +332,6 @@ def index_nuget_package(package_name: str):
     # Shared dependencies directory for all versions of this package
     package_deps_dir = Path(package_name) / 'deps'
 
-    # Track all dependencies used across all package versions
-    used_deps = set()
-
     for package_url in sorted(package_urls):
         assert package_url.startswith(f'{package_url_prefix}{package_name}/'), package_url
         version_path = Path(package_url.removeprefix(package_url_prefix))
@@ -277,7 +342,7 @@ def index_nuget_package(package_name: str):
 
         package_version = version_path.name
         version_path.mkdir(parents=True, exist_ok=True)
-        process_package(package_name, package_version, version_path, package_deps_dir, used_deps)
+        process_package(package_name, package_version, version_path, package_deps_dir)
 
     if config.REMOVE_OLD_PACKAGES:
         for path in Path(package_name).iterdir():
@@ -290,20 +355,7 @@ def index_nuget_package(package_name: str):
             print(f'Removing {path}...')
             shutil.rmtree(path)
 
-        # Remove unused dependencies
-        if package_deps_dir.exists():
-            for dep_id_dir in package_deps_dir.iterdir():
-                if not dep_id_dir.is_dir():
-                    continue
-
-                for dep_version_dir in dep_id_dir.iterdir():
-                    if not dep_version_dir.is_dir():
-                        continue
-
-                    dep_key = (dep_id_dir.name, dep_version_dir.name)
-                    if dep_key not in used_deps:
-                        print(f'Removing unused dependency {dep_id_dir.name}/{dep_version_dir.name}...')
-                        shutil.rmtree(dep_version_dir)
+        remove_unused_dependencies(package_name, Path(package_name))
 
 
 def main():
