@@ -8,29 +8,7 @@ from pathlib import Path
 
 import requests
 
-PACKAGES_TO_INDEX = [{
-    'name': 'Microsoft.UI.Xaml',
-}, {
-    'name': 'Microsoft.WindowsAppSDK',
-}]
-
-# Set to None to index all versions.
-NUM_OF_PACKAGES_TO_INDEX_PREVIEW = None
-NUM_OF_PACKAGES_TO_INDEX_STABLE = None
-
-REMOVE_OLD_PACKAGES = False
-
-# Running cppwinrt on all versions makes the repository much larger (from 200MB
-# to 8.5GB). It can be run locally if needed.
-CPPWINRT_RUN = False
-
-# WINMDIDL_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\winmdidl.exe'
-WINMDIDL_PATH = 'winmdidl.exe'
-
-# CPPWINRT_PATH = R'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\cppwinrt.exe'
-CPPWINRT_PATH = 'cppwinrt.exe'
-
-WINMETADATA_PATH = str(Path(__file__).parent / 'WinMetadata/10.0.26100.2605')
+import config
 
 
 def download_file(url: str, dir: Path):
@@ -203,7 +181,7 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
         if lib_dir.exists():
             package_deps.append(str(lib_dir))
 
-    if CPPWINRT_RUN and (lib_dir := package_dir / 'lib') and lib_dir.exists():
+    if config.CPPWINRT_RUN and (lib_dir := package_dir / 'lib') and lib_dir.exists():
         print(f'  Running cppwinrt...')
 
         cppwinrt_dir = os.environ.get('CPPWINRT_DIR')
@@ -214,9 +192,9 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
 
             cppwinrt_path = cppwinrt_exe[0]
         else:
-            cppwinrt_path = CPPWINRT_PATH
+            cppwinrt_path = config.CPPWINRT_PATH
 
-        cmd = [cppwinrt_path, '-input', WINMETADATA_PATH]
+        cmd = [cppwinrt_path, '-input', config.WINMETADATA_PATH]
 
         for path in lib_dir.iterdir():
             if path.is_dir():
@@ -232,7 +210,7 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
 
     print(f'  Running winmdidl...')
 
-    cmd_start = [WINMDIDL_PATH, f'/metadata_dir:{WINMETADATA_PATH}']
+    cmd_start = [config.WINMDIDL_PATH, f'/metadata_dir:{config.WINMETADATA_PATH}']
     for dep in package_deps:
         cmd_start += [f'/metadata_dir:{dep}']
 
@@ -259,19 +237,19 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
 def index_nuget_package(package_name: str):
     package_urls = get_nuget_package_versions(package_name)
 
-    if (NUM_OF_PACKAGES_TO_INDEX_PREVIEW is not None or
-        NUM_OF_PACKAGES_TO_INDEX_STABLE is not None):
+    if (config.NUM_OF_PACKAGES_TO_INDEX_PREVIEW is not None or
+        config.NUM_OF_PACKAGES_TO_INDEX_STABLE is not None):
         def is_preview(url: str):
             return '-' in url.split('/')[-1]
 
         package_urls_preview = list(filter(is_preview, package_urls))
         package_urls_stable = list(filter(lambda url: not is_preview(url), package_urls))
 
-        if NUM_OF_PACKAGES_TO_INDEX_PREVIEW is not None:
-            package_urls_preview = package_urls_preview[:NUM_OF_PACKAGES_TO_INDEX_PREVIEW]
+        if config.NUM_OF_PACKAGES_TO_INDEX_PREVIEW is not None:
+            package_urls_preview = package_urls_preview[:config.NUM_OF_PACKAGES_TO_INDEX_PREVIEW]
 
-        if NUM_OF_PACKAGES_TO_INDEX_STABLE is not None:
-            package_urls_stable = package_urls_stable[:NUM_OF_PACKAGES_TO_INDEX_STABLE]
+        if config.NUM_OF_PACKAGES_TO_INDEX_STABLE is not None:
+            package_urls_stable = package_urls_stable[:config.NUM_OF_PACKAGES_TO_INDEX_STABLE]
 
         package_urls = package_urls_preview + package_urls_stable
 
@@ -295,7 +273,7 @@ def index_nuget_package(package_name: str):
         version_path.mkdir(parents=True, exist_ok=True)
         process_package(package_name, package_version, version_path, package_deps_dir, used_deps)
 
-    if REMOVE_OLD_PACKAGES:
+    if config.REMOVE_OLD_PACKAGES:
         for path in Path(package_name).iterdir():
             if not path.is_dir() or path.name == 'deps':
                 continue
@@ -323,7 +301,7 @@ def index_nuget_package(package_name: str):
 
 
 def main():
-    for package_details in PACKAGES_TO_INDEX:
+    for package_details in config.PACKAGES_TO_INDEX:
         index_nuget_package(package_details['name'])
 
 
