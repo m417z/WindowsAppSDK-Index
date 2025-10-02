@@ -184,7 +184,19 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
         if lib_dir.exists():
             package_deps.append(str(lib_dir))
 
-    if config.CPPWINRT_RUN and (lib_dir := package_dir / 'lib') and lib_dir.exists():
+    lib_dirs = [
+        package_dir / 'lib',
+        package_dir / 'metadata',
+    ]
+    lib_dirs = [d for d in lib_dirs if d.exists()]
+    if lib_dirs:
+        if len(lib_dirs) > 1:
+            raise RuntimeError(f'Expected only one lib dir, found: {lib_dirs}')
+        lib_dir = lib_dirs[0]
+    else:
+        lib_dir = None
+
+    if lib_dir and config.CPPWINRT_RUN:
         print(f'  Running cppwinrt...')
 
         cppwinrt_dir = os.environ.get('CPPWINRT_DIR')
