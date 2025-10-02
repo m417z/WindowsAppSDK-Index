@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.WindowsAppSDK.ML</id>
+    <version>1.8.2091</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="file">license.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/microsoft/windowsappsdk</projectUrl>
+    <description>The Windows App SDK empowers all Windows Desktop apps with modern Windows UI, APIs, and platform features, including back-compat support. This package contains the Windows Machine Learning APIs.</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Windows "Windows App SDK" WinAppSDK ML MachineLearning APIs</tags>
+    <dependencies>
+      <dependency id="Microsoft.WindowsAppSDK.Base" version="1.8.250831001" />
+      <dependency id="Microsoft.WindowsAppSDK.Foundation" version="1.8.250906002" />
+    </dependencies>
+  </metadata>
+</package>

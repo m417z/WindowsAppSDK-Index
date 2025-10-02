@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.WindowsAppSDK</id>
+    <version>1.0.3</version>
+    <title>Microsoft Windows App SDK</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="file">license.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <projectUrl>https://github.com/microsoft/windowsappsdk</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/microsoft/WindowsAppSDK/main/assets/WindowsAppSDK64.png</iconUrl>
+    <description>WindowsAppSDK</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Windows,WindowsAppSDK,WinUI,UWP,XAML,Fluent,Controls,Downlevel,Compatibility,TreeView,ColorPicker,NavigationView,MenuBar,Resources,Native,DWriteCore,Interactive Experiences,ixp</tags>
+    <dependencies>
+      <dependency id="Microsoft.Windows.SDK.BuildTools" version="10.0.22000.194" />
+    </dependencies>
+  </metadata>
+</package>

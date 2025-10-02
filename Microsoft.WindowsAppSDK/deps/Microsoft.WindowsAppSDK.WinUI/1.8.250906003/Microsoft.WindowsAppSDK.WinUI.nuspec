@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.WindowsAppSDK.WinUI</id>
+    <version>1.8.250906003</version>
+    <title>Microsoft WindowsAppSDK WinUI component</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="file">license.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <projectUrl>https://github.com/microsoft/windowsappsdk</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/microsoft/WindowsAppSDK/main/assets/WindowsAppSDK64.png</iconUrl>
+    <description>The Windows App SDK empowers all Windows Desktop apps with modern Windows UI, APIs, and platform features, including back-compat support. This package contains the modern Windows UI features.</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Windows "Windows App SDK" WinAppSDK WinUI XAML Fluent Controls Downlevel Compatibility TreeView ColorPicker NavigationView MenuBar</tags>
+    <dependencies>
+      <dependency id="Microsoft.Web.WebView2" version="1.0.3179.45" />
+      <dependency id="Microsoft.WindowsAppSDK.Base" version="1.8.250831001" />
+      <dependency id="Microsoft.WindowsAppSDK.Foundation" version="1.8.250906002" />
+      <dependency id="Microsoft.WindowsAppSDK.InteractiveExperiences" version="1.8.250906004" />
+    </dependencies>
+  </metadata>
+</package>

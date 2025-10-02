@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.WindowsAppSDK.InteractiveExperiences</id>
+    <version>1.0.0-experimental1</version>
+    <title>Microsoft Interactive Experiences Library</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">license.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <projectUrl>https://aka.ms/windowsappsdk</projectUrl>
+    <description>This package provides the Microsoft Interactive Experiences features in Windows App SDK.</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Microsoft,WindowsAppSDK,Interactive Experiences</tags>
+    <dependencies>
+      <group />
+      <group targetFramework="UAP10.0" />
+      <group targetFramework="net5.0-windows10.0.17763" />
+    </dependencies>
+  </metadata>
+</package>

@@ -1,0 +1,483 @@
+// Copyright (C) Microsoft Corporation. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// These are the WebView2 experimental APIs published publicly as a part of the
+// WebView2 prerelease package. Modifications to any published interface require
+// a breaking change for the experimental APIs. Otherwise, do not modify
+// published interfaces.
+
+// midl is run from a tools directory with no special include paths setup.
+// To import an IDL from the build you must get out of the tools path
+// first.
+// We include the shipping webview2.idl so that our preview APIs may
+// interact with our public APIs.
+import "../../edge_embedded_browser/client/win/current/webview2.idl";
+
+[uuid(07abc5eb-fae4-4485-bf29-083ac335408b), version(1.0)]
+library WebView2Experimental {
+
+// Forward declarations
+interface ICoreWebView2Experimental4;
+interface ICoreWebView2ExperimentalBrowserProcessExitedEventArgs;
+interface ICoreWebView2ExperimentalBrowserProcessExitedEventHandler;
+interface ICoreWebView2ExperimentalCompositionController3;
+interface ICoreWebView2ExperimentalCompositionController4;
+interface ICoreWebView2ExperimentalEnvironment3;
+interface ICoreWebView2ExperimentalSettings5;
+interface ICoreWebView2ExperimentalUpdateRuntimeCompletedHandler;
+interface ICoreWebView2ExperimentalUpdateRuntimeResult;
+interface ICoreWebView2ExperimentalNewWindowRequestedEventArgs;
+
+// Enums and structs
+
+/// Matrix that represents a 3D transform. This transform is used to
+/// calculate correct coordinates when calling
+/// CreateCoreWebView2PointerInfoFromPointerId. This is equivalent to a
+/// D2D1_MATRIX_4X4_F
+typedef struct COREWEBVIEW2_MATRIX_4X4 {
+  /// The value in the first row and first column of the matrix.
+  FLOAT _11;
+  /// The value in the first row and second column of the matrix.
+  FLOAT _12;
+  /// The value in the first row and third column of the matrix.
+  FLOAT _13;
+  /// The value in the first row and fourth column of the matrix.
+  FLOAT _14;
+  /// The value in the second row and first column of the matrix.
+  FLOAT _21;
+  /// The value in the second row and second column of the matrix.
+  FLOAT _22;
+  /// The value in the second row and third column of the matrix.
+  FLOAT _23;
+  /// The value in the second row and fourth column of the matrix.
+  FLOAT _24;
+  /// The value in the third row and first column of the matrix.
+  FLOAT _31;
+  /// The value in the third row and second column of the matrix.
+  FLOAT _32;
+  /// The value in the third row and third column of the matrix.
+  FLOAT _33;
+  /// The value in the third row and fourth column of the matrix.
+  FLOAT _34;
+  /// The value in the fourth row and first column of the matrix.
+  FLOAT _41;
+  /// The value in the fourth row and second column of the matrix.
+  FLOAT _42;
+  /// The value in the fourth row and third column of the matrix.
+  FLOAT _43;
+  /// The value in the fourth row and fourth column of the matrix.
+  FLOAT _44;
+} COREWEBVIEW2_MATRIX_4X4;
+
+/// Status of UpdateRuntime operation result.
+[v1_enum]
+typedef enum COREWEBVIEW2_UPDATE_RUNTIME_STATUS {
+
+  /// Latest version of Edge WebView2 Runtime is installed.
+  /// No update for Edge WebView2 Runtime is available, or Edge WebView2
+  /// Runtime is updated successfully and latest version is now installed.
+  COREWEBVIEW2_UPDATE_RUNTIME_STATUS_LATEST_VERSION_INSTALLED,
+
+  /// Edge WebView2 Runtime update is already running, which could be
+  /// triggered by auto update or by other UpdateRuntime request from some app.
+  COREWEBVIEW2_UPDATE_RUNTIME_STATUS_UPDATE_ALREADY_RUNNING,
+
+  /// Edge WebView2 Runtime update is blocked by group policy.
+  COREWEBVIEW2_UPDATE_RUNTIME_STATUS_BLOCKED_BY_POLICY,
+
+  /// Edge WebView2 Runtime update failed.
+  /// See `ExtendedError` property of UpdateRuntimeResult for more
+  /// information about the failure.
+  COREWEBVIEW2_UPDATE_RUNTIME_STATUS_FAILED,
+} COREWEBVIEW2_UPDATE_RUNTIME_STATUS;
+
+/// Specifies the browser process exit type used in the
+/// `ICoreWebView2ExperimentalBrowserProcessExitedEventArgs` interface.
+[v1_enum]
+typedef enum COREWEBVIEW2_BROWSER_PROCESS_EXIT_KIND {
+  /// Indicates that the browser process ended normally.
+  COREWEBVIEW2_BROWSER_PROCESS_EXIT_KIND_NORMAL,
+
+  /// Indicates that the browser process ended unexpectedly.
+  /// A `ProcessFailed` event will also be sent to listening WebViews from the
+  /// `ICoreWebView2Environment` associated to the failed process.
+  COREWEBVIEW2_BROWSER_PROCESS_EXIT_KIND_FAILED
+} COREWEBVIEW2_BROWSER_PROCESS_EXIT_KIND;
+
+// PDF toolbar item. This enum must be in sync with ToolBarItem in pdf-store.ts
+/// Specifies the PDF toolbar item types used for the `ICoreWebView2StagingSettings::put_HiddenPdfToolbarItems` method.
+[v1_enum]
+typedef enum COREWEBVIEW2_PDF_TOOLBAR_ITEMS {
+
+  /// No item
+
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_NONE  = 0x0,
+
+  /// The save button
+
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_SAVE  = 0x0001,
+
+  /// The print button
+
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_PRINT  = 0x0002,
+
+  /// The save as button
+
+  COREWEBVIEW2_PDF_TOOLBAR_ITEMS_SAVE_AS  = 0x0004,
+
+
+} COREWEBVIEW2_PDF_TOOLBAR_ITEMS;
+cpp_quote("DEFINE_ENUM_FLAG_OPERATORS(COREWEBVIEW2_PDF_TOOLBAR_ITEMS);")
+
+// End of enums and structs
+
+/// This interface is an extension of `ICoreWebView2` that manages opening
+/// the browser task manager window.
+[uuid(9865766b-d7c1-49fc-816e-f54aaee3396d), object, pointer_default(unique)]
+interface ICoreWebView2Experimental4 : IUnknown {
+  /// Opens the Browser Task Manager view as a new window. Does nothing
+  /// when the Browser Task Manager is already open.
+  /// WebView2 currently blocks the `Shift+Esc` shortcut for opening the
+  /// task manager. An end user can open the browser task manager manually
+  /// via the `Browser task manager` entry of the DevTools window's title 
+  /// bar's context menu.
+  HRESULT OpenTaskManagerWindow();
+}
+
+/// Event args for the `BrowserProcessExited` event.
+[uuid(1f00663f-af8c-4782-9cdd-dd01c52e34cb), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalBrowserProcessExitedEventArgs : IUnknown {
+  /// The kind of browser process exit that has occurred.
+  [propget] HRESULT BrowserProcessExitKind(
+      [out, retval] COREWEBVIEW2_BROWSER_PROCESS_EXIT_KIND* browserProcessExitKind);
+
+  /// The process ID of the browser process that has exited.
+  [propget] HRESULT BrowserProcessId([out, retval] UINT32* value);
+}
+
+/// Receives `BrowserProcessExited` events.
+[uuid(fa504257-a216-4911-a860-fe8825712861), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalBrowserProcessExitedEventHandler : IUnknown {
+  /// Provides the event args for the corresponding event.
+  HRESULT Invoke(
+      [in] ICoreWebView2Environment* sender,
+      [in] ICoreWebView2ExperimentalBrowserProcessExitedEventArgs* args);
+}
+
+/// The UpdateRuntime operation result.
+[uuid(DD503E49-AB19-47C0-B2AD-6DDD09CC3E3A), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalUpdateRuntimeResult : IUnknown {
+
+  /// The status for the UpdateRuntime operation.
+  [propget] HRESULT Status(
+      [out, retval] COREWEBVIEW2_UPDATE_RUNTIME_STATUS* status);
+
+  /// The update error happened while trying to update Edge WebView2 Runtime.
+  /// ExtendedError will be S_OK if Status is not `COREWEBVIEW2_UPDATE_RUNTIME_STATUS_FAILED`
+  /// or `COREWEBVIEW2_UPDATE_RUNTIME_STATUS_BLOCKED_BY_POLICY`.
+  [propget] HRESULT ExtendedError([out, retval] HRESULT* error);
+}
+
+/// The caller implements this interface to receive the UpdateRuntime result.
+[uuid(F1D2D722-3721-499C-87F5-4C405260697A), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalUpdateRuntimeCompletedHandler : IUnknown {
+
+  /// Provides the result for the UpdateRuntime operation.
+  /// `errorCode` will be S_OK if the update operation can be performed
+  /// normally, regardless of whether we could update the Edge WebView2
+  /// Runtime. If an unexpected error interrupts the update operation, error
+  /// code of that unexpected error would be set as `errorCode`.
+  /// When update operation can be performed normally, but update resulted in
+  /// failure, like download failed, the error code would be presented as
+  /// `ExtendedError` property of ICoreWebView2ExperimentalUpdateRuntimeResult.
+  HRESULT Invoke([in] HRESULT errorCode,
+                 [in] ICoreWebView2ExperimentalUpdateRuntimeResult* result);
+}
+
+/// This interface is an extension of the ICoreWebView2Environment that manages
+/// updating Edge WebView2 Runtime. An object implementing the
+/// ICoreWebView2ExperimentalEnvironment3 interface will also implement
+/// ICoreWebView2Environment.
+[uuid(9A2BE885-7F0B-4B26-B6DD-C969BAA00BF1), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalEnvironment3 : IUnknown {
+  /// Try to update the installed Microsoft Edge WebView2 Runtime.
+  /// This will potentially result in a new version of the Edge WebView2
+  /// Runtime being installed and `NewBrowserVersionAvailable` event being raised.
+  /// There is no guarantee on the order of that event being raised and
+  /// UpdateRuntime's completed handler being invoked. Besides the
+  /// `NewBrowserVersionAvailable` event, there will be no impact to any
+  /// currently running WebView2s when the update is installed.
+  /// Even though the Edge WebView2 Runtime update is installed for the machine
+  /// and available to all users, the update will happen silently and not show
+  /// elevation prompt.
+  /// This will not impact Edge browser installations.
+  /// The latest version can always be queried using the
+  /// `GetAvailableCoreWebView2BrowserVersionString` API.
+  /// The UpdateRuntime method is only supported for an installed Edge WebView2
+  /// Runtime. When running a fixed version Edge WebView2 Runtime or non stable
+  /// channel Edge browser, this API will return `HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)`.
+  /// There could only be one active UpdateRuntime operation in an app process,
+  /// and calling this API before the completed handler for a previous call is invoked
+  /// will fail with `HRESULT_FROM_WIN32(ERROR_BUSY)`.
+  /// Calling this API repeatedly in a short period of time, will also fail with
+  /// `HRESULT_FROM_WIN32(ERROR_BUSY)`. To protect accidental abuse of the update
+  /// service, the implementation throttles the calls of this API to 3 times within
+  /// 5 minutes in a process. The exact throttling limit can change in the future.
+  /// Edge update service can only support one update request at a time globally.
+  /// If there is already an update operation running in the Edge update service,
+  /// UpdateRuntime request will result in the completed handler being invoked with a
+  /// result that has `Status` of `COREWEBVIEW2_UPDATE_RUNTIME_STATUS_UPDATE_ALREADY_RUNNING`.
+  /// As the running update could succeed or fail, the app should retry later if
+  /// `NewBrowserVersionAvailable` event has not been raised.
+  /// The UpdateRuntime operation is associated with the CoreWebView2Environment
+  /// object and any ongoing UpdateRuntime operation will be aborted when the
+  /// associated CoreWebView2Environment along with the CoreWebView2 objects that
+  /// are created by the CoreWebView2Environment object are all released. In this
+  /// case, the completed handler will be invoked with `S_OK` as `errorCode` and a
+  /// result object with `Status` of COREWEBVIEW2_UPDATE_RUNTIME_STATUS_FAILED and
+  /// `ExtendedError` as `E_ABORT`.
+  ///
+  /// \snippet AppWindow.cpp UpdateRuntime
+  HRESULT UpdateRuntime(
+      [in] ICoreWebView2ExperimentalUpdateRuntimeCompletedHandler* handler);
+}
+
+/// This interface is an extension of the ICoreWebView2Environment that supports
+/// BrowserProcessExited event. An object implementing the
+/// ICoreWebView2ExperimentalEnvironment4 interface will also implement
+/// ICoreWebView2Environment.
+[uuid(0204e16b-7bc8-4bdc-94d7-1e70c4d1a8a7), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalEnvironment4 : IUnknown {
+  /// Add an event handler for the `BrowserProcessExited` event.
+  /// The `BrowserProcessExited` event is raised when the collection of WebView2
+  /// Runtime processes for the browser process of this environment terminate
+  /// due to browser process failure or normal shutdown (for example, when all
+  /// associated WebViews are closed), after all resources have been released
+  /// (including the user data folder). To learn about what these processes are,
+  /// go to [Process model](/microsoft-edge/webview2/concepts/process-model).
+  ///
+  /// A handler added with this method is called until removed with
+  /// `remove_BrowserProcessExited`, even if a new browser process is bound to
+  /// this environment after earlier `BrowserProcessExited` events are raised.
+  ///
+  /// Multiple app processes can share a browser process by creating their webviews
+  /// from a `ICoreWebView2Environment` with the same user data folder. When the entire
+  /// collection of WebView2Runtime processes for the browser process exit, all
+  /// associated `ICoreWebView2Environment` objects receive the `BrowserProcessExited`
+  /// event. Multiple processes sharing the same browser process need to coordinate
+  /// their use of the shared user data folder to avoid race conditions and
+  /// unnecessary waits. For example, one process should not clear the user data
+  /// folder at the same time that another process recovers from a crash by recreating
+  /// its WebView controls; one process should not block waiting for the event if
+  /// other app processes are using the same browser process (the browser process will
+  /// not exit until those other processes have closed their webviews too).
+  ///
+  /// Note this is an event from the `ICoreWebView2Environment3` interface, not
+  /// the `ICoreWebView2` one. The difference between `BrowserProcessExited` and
+  /// `ICoreWebView2`'s `ProcessFailed` is that `BrowserProcessExited` is
+  /// raised for any **browser process** exit (expected or unexpected, after all
+  /// associated processes have exited too), while `ProcessFailed` is raised for
+  /// **unexpected** process exits of any kind (browser, render, GPU, and all
+  /// other types), or for main frame **render process** unresponsiveness. To
+  /// learn more about the WebView2 Process Model, go to
+  /// [Process model](/microsoft-edge/webview2/concepts/process-model).
+  ///
+  /// In the case the browser process crashes, both `BrowserProcessExited` and
+  /// `ProcessFailed` events are raised, but the order is not guaranteed. These
+  /// events are intended for different scenarios. It is up to the app to
+  /// coordinate the handlers so they do not try to perform reliability recovery
+  /// while also trying to move to a new WebView2 Runtime version or remove the
+  /// user data folder.
+  ///
+  /// \snippet AppWindow.cpp Close
+  HRESULT add_BrowserProcessExited(
+      [in] ICoreWebView2ExperimentalBrowserProcessExitedEventHandler* eventHandler,
+      [out] EventRegistrationToken* token);
+
+  /// Remove an event handler previously added with `add_BrowserProcessExited`.
+  HRESULT remove_BrowserProcessExited([in] EventRegistrationToken token);
+}
+
+/// This interface is an extension of the ICoreWebView2CompositionController.
+/// An object implementing ICoreWebView2ExperimentalCompositionController4
+/// interface will also implement ICoreWebView2CompositionController.
+[uuid(e6041d7f-18ac-4654-a04e-8b3f81251c33), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalCompositionController4 : IUnknown {
+  /// Returns the UI Automation Provider for the WebView.
+  [propget] HRESULT UIAProvider([out, retval] IUnknown** provider);
+
+  /// A helper function to convert a pointerId received from the system into
+  /// an ICoreWebView2ExperimentalPointerInfo.
+  /// parentWindow is the HWND that contains the WebView. This can be any HWND
+  /// in the hwnd tree that contains the WebView.
+  /// The COREWEBVIEW2_MATRIX_4X4 is the transform from that HWND to the WebView.
+  /// The returned ICoreWebView2ExperimentalPointerInfo is used in SendPointerInfo.
+  /// The pointer type must be either pen or touch or the function will fail.
+  HRESULT CreateCoreWebView2PointerInfoFromPointerId(
+      [in] UINT pointerId,
+      [in] HWND parentWindow,
+      [in] struct COREWEBVIEW2_MATRIX_4X4 transform,
+      [out, retval] ICoreWebView2PointerInfo** pointerInfo);
+}
+
+/// This interface is continuation of the
+/// ICoreWebView2CompositionController interface to manage drag and
+/// drop.
+[uuid(b134916b-a104-4d2a-9567-c2fd53714350), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalCompositionController3 : IUnknown {
+  /// This function corresponds to \[IDropTarget::DragEnter\]\[WindowsWin32ApiOleidlNfOleidlIdroptargetDragenter\].
+  ///
+  /// This function has a dependency on AllowDrop property of
+  /// CoreWebView2Controller and return E_FAIL to callers to indicate this
+  /// operation is not allowed if AllowDrop property is set to false.
+  ///
+  /// The hosting application must register as an IDropTarget and implement
+  /// and forward DragEnter calls to this function.
+  ///
+  /// In addition, the hosting application needs to create an IDropTargetHelper
+  /// and call the corresponding \[IDropTargetHelper::DragEnter\]\[WindowsWin32ApiShobjidlCoreNfShobjidlCoreIdroptargethelperDragenter\] function on that
+  /// object before forwarding the call to WebView.
+  ///
+  /// point parameter must be modified to include the WebView's offset and be in
+  /// the WebView's client coordinates (Similar to how SendMouseInput works).
+  ///
+  /// \[WindowsWin32ApiOleidlNfOleidlIdroptargetDragenter\]: /windows/win32/api/oleidl/nf-oleidl-idroptarget-dragenter "IDropTarget::DragEnter (oleidl.h) - Win32 apps | Microsoft Docs"
+  ///
+  /// \[WindowsWin32ApiShobjidlCoreNfShobjidlCoreIdroptargethelperDragenter\]: /windows/win32/api/shobjidl_core/nf-shobjidl_core-idroptargethelper-dragenter "IDropTargetHelper::DragEnter (shobjidl_core.h) - Win32 apps | Microsoft Docs"
+  ///
+  /// \snippet DropTarget.cpp DragEnter
+  HRESULT DragEnter(
+      [in] IDataObject* dataObject,
+      [in] DWORD keyState,
+      [in] POINT point,
+      [out, retval] DWORD* effect);
+
+  /// This function corresponds to \[IDropTarget::DragLeave\]\[WindowsWin32ApiOleidlNfOleidlIdroptargetDragleave\].
+  ///
+  /// This function has a dependency on AllowDrop property of
+  /// CoreWebView2Controller and return E_FAIL to callers to indicate this
+  /// operation is not allowed if AllowDrop property is set to false.
+  ///
+  /// The hosting application must register as an IDropTarget and implement
+  /// and forward DragLeave calls to this function.
+  ///
+  /// In addition, the hosting application needs to create an IDropTargetHelper
+  /// and call the corresponding \[IDropTargetHelper::DragLeave\]\[WindowsWin32ApiShobjidlCoreNfShobjidlCoreIdroptargethelperDragleave\] function on that
+  /// object before forwarding the call to WebView.
+  ///
+  /// \[WindowsWin32ApiOleidlNfOleidlIdroptargetDragleave\]: /windows/win32/api/oleidl/nf-oleidl-idroptarget-dragleave "IDropTarget::DragLeave (oleidl.h) - Win32 apps | Microsoft Docs"
+  ///
+  /// \[WindowsWin32ApiShobjidlCoreNfShobjidlCoreIdroptargethelperDragleave\]: /windows/win32/api/shobjidl_core/nf-shobjidl_core-idroptargethelper-dragleave "IDropTargetHelper::DragLeave (shobjidl_core.h) - Win32 apps | Microsoft Docs"
+  ///
+  /// \snippet DropTarget.cpp DragLeave
+  HRESULT DragLeave();
+
+  /// This function corresponds to \[IDropTarget::DragOver\]\[WindowsWin32ApiOleidlNfOleidlIdroptargetDragover\].
+  ///
+  /// This function has a dependency on AllowDrop property of
+  /// CoreWebView2Controller and return E_FAIL to callers to indicate this
+  /// operation is not allowed if AllowDrop property is set to false.
+  ///
+  /// The hosting application must register as an IDropTarget and implement
+  /// and forward DragOver calls to this function.
+  ///
+  /// In addition, the hosting application needs to create an IDropTargetHelper
+  /// and call the corresponding \[IDropTargetHelper::DragOver\]\[WindowsWin32ApiShobjidlCoreNfShobjidlCoreIdroptargethelperDragover\] function on that
+  /// object before forwarding the call to WebView.
+  ///
+  /// point parameter must be modified to include the WebView's offset and be in
+  /// the WebView's client coordinates (Similar to how SendMouseInput works).
+  ///
+  /// \[WindowsWin32ApiOleidlNfOleidlIdroptargetDragover\]: /windows/win32/api/oleidl/nf-oleidl-idroptarget-dragover "IDropTarget::DragOver (oleidl.h) - Win32 apps | Microsoft Docs"
+  ///
+  /// \[WindowsWin32ApiShobjidlCoreNfShobjidlCoreIdroptargethelperDragover\]: /windows/win32/api/shobjidl_core/nf-shobjidl_core-idroptargethelper-dragover "IDropTargetHelper::DragOver (shobjidl_core.h) - Win32 apps | Microsoft Docs"
+  ///
+  /// \snippet DropTarget.cpp DragOver
+  HRESULT DragOver(
+      [in] DWORD keyState,
+      [in] POINT point,
+      [out, retval] DWORD* effect);
+
+  /// This function corresponds to \[IDropTarget::Drop\]\[WindowsWin32ApiOleidlNfOleidlIdroptargetDrop\].
+  ///
+  /// This function has a dependency on AllowDrop property of
+  /// CoreWebView2Controller and return E_FAIL to callers to indicate this
+  /// operation is not allowed if AllowDrop property is set to false.
+  ///
+  /// The hosting application must register as an IDropTarget and implement
+  /// and forward Drop calls to this function.
+  ///
+  /// In addition, the hosting application needs to create an IDropTargetHelper
+  /// and call the corresponding \[IDropTargetHelper::Drop\]\[WindowsWin32ApiShobjidlCoreNfShobjidlCoreIdroptargethelperDrop\] function on that
+  /// object before forwarding the call to WebView.
+  ///
+  /// point parameter must be modified to include the WebView's offset and be in
+  /// the WebView's client coordinates (Similar to how SendMouseInput works).
+  ///
+  /// \[WindowsWin32ApiOleidlNfOleidlIdroptargetDrop\]: /windows/win32/api/oleidl/nf-oleidl-idroptarget-drop "IDropTarget::Drop (oleidl.h) - Win32 apps | Microsoft Docs"
+  ///
+  /// \[WindowsWin32ApiShobjidlCoreNfShobjidlCoreIdroptargethelperDrop\]: /windows/win32/api/shobjidl_core/nf-shobjidl_core-idroptargethelper-drop "IDropTargetHelper::Drop (shobjidl_core.h) - Win32 apps | Microsoft Docs"
+  ///
+  /// \snippet DropTarget.cpp Drop
+  HRESULT Drop(
+      [in] IDataObject* dataObject,
+      [in] DWORD keyState,
+      [in] POINT point,
+      [out, retval] DWORD* effect);
+}
+
+/// This is an extension of the ICoreWebView2Settings Experimental interface for
+/// IsSwipeNavigationEnabled.
+[uuid(45b1f964-f703-47ac-a19a-b589dd0c5559), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalSettings5 : IUnknown {
+  /// The `IsSwipeNavigationEnabled` property enables or disables the ability of the
+  /// end user to use swiping gesture on touch input enabled devices to
+  /// navigate in WebView2.
+  /// Swiping gesture navigation on touch screen includes:
+  /// 1. Swipe left/right (swipe horizontally) to navigate to previous/next
+  /// page in navigation history.
+  /// 2. Pull to refresh (swipe vertically) the current page. (This feature is
+  /// currently disabled by default in the browser, to enable in WebView2, use
+  /// `put_AdditionalBrowserArguments` api with "--pull-to-refresh" switch).
+  /// It defaults to `TRUE`.
+  /// When set to `FALSE`, the end user cannot swipe to navigate or pull to refresh.
+  /// This API only affects the overscrolling navigation functionality and has no
+  /// effect on the scrolling interaction used to explore the web content shown
+  /// in WebView2.
+  ///
+  /// \snippet SettingsComponent.cpp ToggleSwipeNavigationEnabled
+  [propget] HRESULT IsSwipeNavigationEnabled([out, retval] BOOL* enabled);
+  /// Set the `IsSwipeNavigationEnabled` property
+  [propput] HRESULT IsSwipeNavigationEnabled([in] BOOL enabled);
+}
+
+/// This is an extension of the ICoreWebView2Settings Experimental interface for HiddenPdfToolbarItems.
+[uuid(d98de66d-46d7-4090-91e1-edf8e66fdb7b), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalSettings6: IUnknown {
+  /// `HiddenPdfToolbarItems` is used to customize the PDF toolbar items. By default, it is COREWEBVIEW2_PDF_TOOLBAR_ITEMS_NONE and so it displays all of the items.
+  /// Changes to this property apply to all CoreWebView2s in the same environment and using the same profile.
+  /// Changes to this setting apply only after the next navigation.
+  /// \snippet SettingsComponent.cpp ToggleHidePdfToolbarItems
+
+  [propget] HRESULT HiddenPdfToolbarItems([out, retval] COREWEBVIEW2_PDF_TOOLBAR_ITEMS* hidden_pdf_toolbar_items);
+
+  [propput] HRESULT HiddenPdfToolbarItems([in] COREWEBVIEW2_PDF_TOOLBAR_ITEMS hidden_pdf_toolbar_items);
+}
+
+/// This is a continuation of the `ICoreWebView2NewWindowRequestedEventArgs` interface.
+[uuid(f813e079-73ba-4e6f-a4a8-d08c8358fdeb), object, pointer_default(unique)]
+interface ICoreWebView2ExperimentalNewWindowRequestedEventArgs : IUnknown {
+  /// Gets the name of the new window. This window can be created via `window.open(url, windowName)`,
+  /// where the windowName parameter corresponds to `Name` property.
+  /// If no windowName is passed to `window.open`, then the `Name` property
+  /// will be set to an empty string. Additionally, if window is opened through other means,
+  /// such as `<a target="windowName">...</a>` or `<iframe name="windowName">...</iframe>`,
+  /// then the `Name` property will be set accordingly. In the case of target=_blank,
+  /// the `Name` property will be an empty string.
+  /// Opening a window via ctrl+clicking a link would result in the `Name` property
+  /// being set to an empty string.
+  [propget] HRESULT Name([out, retval] LPWSTR* value);
+}
+
+}

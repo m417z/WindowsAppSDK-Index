@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.Windows.SDK.BuildTools.MSIX</id>
+    <version>1.7.20250806.1</version>
+    <authors>Microsoft</authors>
+    <developmentDependency>true</developmentDependency>
+    <license type="file">sdk_license.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>nuget_icon.png</icon>
+    <projectUrl>https://aka.ms/WinSDKProjectURL</projectUrl>
+    <description>This package generates an .msix from the output of your project.</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>WindowsSDK build tools MSIX</tags>
+    <repository type="git" commit="b142a75c4d05ecac1223de9bad94d29f02e038c6" />
+  </metadata>
+</package>

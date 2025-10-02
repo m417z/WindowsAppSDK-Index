@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.UI.Xaml</id>
+    <version>2.8.7-prerelease.241119001</version>
+    <title>Windows UI Library</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="file">license.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <projectUrl>https://github.com/microsoft/microsoft-ui-xaml</projectUrl>
+    <iconUrl>https://aka.ms/winui_icon</iconUrl>
+    <description>This package provides backward-compatible versions of Windows UI features including UWP XAML controls, and Fluent styles and materials. It is part of the Windows UI Library.</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Windows WinUI UWP XAML Fluent Controls Downlevel Compatibility TreeView ColorPicker NavigationView MenuBar</tags>
+    <dependencies>
+      <group targetFramework="native0.0">
+        <dependency id="Microsoft.Web.WebView2" version="1.0.2849.39" />
+      </group>
+      <group targetFramework="net8.0-windows10.0.22621">
+        <dependency id="Microsoft.Web.WebView2" version="1.0.2849.39" />
+      </group>
+      <group targetFramework="UAP10.0">
+        <dependency id="Microsoft.Web.WebView2" version="1.0.2849.39" />
+      </group>
+    </dependencies>
+    <frameworkReferences>
+      <group targetFramework="net8.0-windows10.0.22621">
+        <frameworkReference name="Microsoft.Windows.SDK.NET.Ref.Xaml" />
+      </group>
+    </frameworkReferences>
+  </metadata>
+</package>
