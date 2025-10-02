@@ -15,6 +15,8 @@ jobs:
   run:
     runs-on: windows-latest
     steps:
+      - name: Configure git
+        run: git config --system core.longpaths true
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Python
