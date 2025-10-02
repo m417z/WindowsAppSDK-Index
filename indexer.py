@@ -121,7 +121,9 @@ def extract_dependencies_from_nuspec(nuspec_path: Path):
     return dependencies
 
 
-def collect_all_dependencies(nuspec_path: Path, deps_dir: Path, collected: Optional[set] = None):
+def collect_all_dependencies(
+    nuspec_path: Path, deps_dir: Path, collected: Optional[set] = None
+) -> set[tuple[str, str]]:
     """Recursively collect all dependencies (including transitive ones) from a .nuspec file.
 
     Args:
@@ -152,6 +154,19 @@ def collect_all_dependencies(nuspec_path: Path, deps_dir: Path, collected: Optio
             collect_all_dependencies(dep_nuspec, deps_dir, collected)
 
     return collected
+
+
+def get_winmd_dirs(package_id: str, package_dir: Path, deps_dir: Path):
+    nuspec_file = package_dir / f'{package_id}.nuspec'
+
+    winrt_dirs = {p.parent for p in package_dir.rglob('*.winmd')}
+
+    dependencies = collect_all_dependencies(nuspec_file, deps_dir)
+    for dep_id, dep_version in dependencies:
+        dep_dir = deps_dir / dep_id / dep_version
+        winrt_dirs.update(p.parent for p in dep_dir.rglob('*.winmd'))
+
+    return winrt_dirs
 
 
 def process_package(package_id: str, package_version: str, package_dir: Path, deps_dir: Path):
@@ -212,7 +227,10 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
 
     cmd_start = [config.WINMDIDL_PATH, f'/metadata_dir:{config.WINMETADATA_PATH}']
 
-    for path in package_dir.glob('**/*.winmd'):
+    for winmd_dir in get_winmd_dirs(package_id, package_dir, deps_dir):
+        cmd_start += [f'/metadata_dir:{winmd_dir}']
+
+    for path in package_dir.rglob('*.winmd'):
         # Use a temp directory to avoid long path issues
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_outdir = Path(temp_dir) / 'w'
@@ -234,25 +252,7 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
 
 
 def run_cppwinrt(package_id: str, package_version: str, package_dir: Path, deps_dir: Path):
-    nuspec_file = package_dir / f'{package_id}.nuspec'
-
-    cppwinrt_inputs_dirs: list[Path] = [
-        package_dir / 'lib',
-        package_dir / 'metadata',
-    ]
-
-    dependencies = collect_all_dependencies(nuspec_file, deps_dir)
-    for dep_id, dep_version in dependencies:
-        dep_dir = deps_dir / dep_id / dep_version
-        cppwinrt_inputs_dirs.append(dep_dir / 'lib')
-        cppwinrt_inputs_dirs.append(dep_dir / 'metadata')
-
-    cppwinrt_inputs = []
-    for cppwinrt_inputs_dir in cppwinrt_inputs_dirs:
-        if cppwinrt_inputs_dir.exists():
-            cppwinrt_inputs.append(cppwinrt_inputs_dir)
-            cppwinrt_inputs.extend(x for x in cppwinrt_inputs_dir.iterdir() if x.is_dir())
-
+    cppwinrt_inputs = get_winmd_dirs(package_id, package_dir, deps_dir)
     if not cppwinrt_inputs:
         print(f'No inputs found for cppwinrt, skipping...')
         return
