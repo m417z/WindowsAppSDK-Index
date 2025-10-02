@@ -91,8 +91,13 @@ def extract_dependencies_from_nuspec(nuspec_path: Path):
     dependencies = []
     seen = set()  # Track seen dependencies to avoid duplicates
 
-    # Find all dependency elements
+    # Find all dependency elements (both direct and within groups)
     dep_elements = dependencies_container.findall(f'{{{namespace}}}dependency')
+
+    # Also look for dependencies within group elements
+    groups = dependencies_container.findall(f'{{{namespace}}}group')
+    for group in groups:
+        dep_elements.extend(group.findall(f'{{{namespace}}}dependency'))
 
     for dep in dep_elements:
         dep_id = dep.attrib.get('id')
