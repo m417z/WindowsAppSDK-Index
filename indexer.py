@@ -207,16 +207,16 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
                     raise
 
                 prev_version = dep['version']
-                if dep == {'id': 'Microsoft.WindowsAppSDK.Base', 'version': '1.8.250501001-experimental'}:
-                    dep = {'id': dep['id'], 'version': '1.8.250509001-experimental'}
-                elif dep == {'id': 'Microsoft.WindowsAppSDK.InteractiveExperiences', 'version': '1.8.250506001-experimental'}:
-                    dep = {'id': dep['id'], 'version': '1.8.250509002-experimental'}
-                elif dep in [
-                    {'id': 'Microsoft.WindowsAppSDK.Foundation', 'version': '1.8.0-20250429.5.nightly.internal'},
-                    {'id': 'Microsoft.WindowsAppSDK.Foundation', 'version': '1.8.250504002-experimental'},
-                ]:
-                    dep = {'id': dep['id'], 'version': '1.8.250507001-experimental'}
-                else:
+
+                # Check if this dependency has a version override.
+                override_found = False
+                for override in config.DEPENDENCY_VERSION_OVERRIDES:
+                    if dep['id'] == override['id'] and dep['version'] in override['old_versions']:
+                        dep = {'id': dep['id'], 'version': override['new_version']}
+                        override_found = True
+                        break
+
+                if not override_found:
                     raise
 
                 print(f'Dependency {dep["id"]} {prev_version} not found, trying {dep["version"]}...')
