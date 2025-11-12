@@ -43,6 +43,11 @@ DEPENDENCY_VERSION_OVERRIDES = [
         'new_version': '1.8.250507001-experimental',
     },
     {
+        'id': 'Microsoft.WindowsAppSDK.Foundation',
+        'old_versions': ['2.0.3-experimental'],
+        'new_version': '2.0.8-experimental',
+    },
+    {
         'id': 'Microsoft.WindowsAppSDK.InteractiveExperiences',
         'old_versions': ['1.8.250506001-experimental'],
         'new_version': '1.8.250509002-experimental',
