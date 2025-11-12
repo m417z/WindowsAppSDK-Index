@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.WindowsAppSDK</id>
+    <version>2.0.0-experimental3</version>
+    <title>Microsoft Windows App SDK</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="file">license.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>Icon.png</icon>
+    <projectUrl>https://github.com/microsoft/windowsappsdk</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/microsoft/WindowsAppSDK/main/assets/WindowsAppSDK64.png</iconUrl>
+    <description>The Windows App SDK empowers all Windows Desktop apps with modern Windows UI, APIs, and platform features, including back-compat support.</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Windows "Windows App SDK" WinAppSDK WinUI XAML Fluent Controls Downlevel Compatibility TreeView ColorPicker NavigationView MenuBar Resources Native DWriteCore "Interactive Experiences" ixp "Project Reunion" ProjectReunion</tags>
+    <dependencies>
+      <dependency id="Microsoft.WindowsAppSDK.Base" version="[2.0.0-experimental]" />
+      <dependency id="Microsoft.WindowsAppSDK.Foundation" version="[2.0.8-experimental]" />
+      <dependency id="Microsoft.WindowsAppSDK.InteractiveExperiences" version="[2.0.3-experimental]" />
+      <dependency id="Microsoft.WindowsAppSDK.WinUI" version="[2.0.3-experimental]" />
+      <dependency id="Microsoft.WindowsAppSDK.DWrite" version="[2.0.0-experimental]" />
+      <dependency id="Microsoft.WindowsAppSDK.Widgets" version="[2.0.2-experimental]" />
+      <dependency id="Microsoft.WindowsAppSDK.AI" version="[2.0.57-experimental]" />
+      <dependency id="Microsoft.WindowsAppSDK.ML" version="[2.0.44-experimental]" />
+      <dependency id="Microsoft.WindowsAppSDK.Runtime" version="[2.0.0-experimental3]" />
+    </dependencies>
+  </metadata>
+</package>
