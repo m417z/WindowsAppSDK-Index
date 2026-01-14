@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.WindowsAppSDK.ML</id>
+    <version>2.0.169-experimental</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="file">license.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/microsoft/windowsappsdk</projectUrl>
+    <description>The Windows App SDK empowers all Windows Desktop apps with modern Windows UI, APIs, and platform features, including back-compat support. This package contains the Windows Machine Learning APIs.</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Windows "Windows App SDK" WinAppSDK ML MachineLearning APIs</tags>
+    <dependencies>
+      <group targetFramework="native0.0">
+        <dependency id="Microsoft.WindowsAppSDK.Base" version="2.0.1-experimental" />
+        <dependency id="Microsoft.WindowsAppSDK.Foundation" version="2.0.11-experimental" />
+      </group>
+      <group targetFramework="net6.0-windows10.0.17763">
+        <dependency id="Microsoft.WindowsAppSDK.Base" version="2.0.1-experimental" />
+        <dependency id="Microsoft.WindowsAppSDK.Foundation" version="2.0.11-experimental" />
+      </group>
+      <group targetFramework="net8.0-windows10.0.17763">
+        <dependency id="Microsoft.WindowsAppSDK.Base" version="2.0.1-experimental" />
+        <dependency id="Microsoft.WindowsAppSDK.Foundation" version="2.0.11-experimental" />
+        <dependency id="System.Numerics.Tensors" version="9.0.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
