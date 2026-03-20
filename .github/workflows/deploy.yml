@@ -18,9 +18,9 @@ jobs:
       - name: Configure git
         run: git config --system core.longpaths true
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
       - name: Install Python dependencies
