@@ -23,20 +23,12 @@ def download_file(url: str, dir: Path):
     return target_path
 
 
-def get_nuget_package_versions(package_name: str):
-    url = f'https://www.nuget.org/packages/{package_name}/atom.xml'
+def get_nuget_package_versions(package_name: str) -> list[str]:
+    """Get all available versions of a NuGet package, sorted by version."""
+    url = f'https://api.nuget.org/v3-flatcontainer/{package_name.lower()}/index.json'
     r = requests.get(url)
     r.raise_for_status()
-
-    tree = ET.fromstring(r.content)
-
-    ns = {
-        'xmlns': 'http://www.w3.org/2005/Atom',
-    }
-
-    links = tree.findall('xmlns:entry/xmlns:link', namespaces=ns)
-
-    return [x.attrib['href'] for x in links]
+    return r.json()['versions']
 
 
 def parse_nuget_version(version_string: str) -> str:
@@ -67,30 +59,18 @@ def parse_nuget_version(version_string: str) -> str:
     return min_version
 
 
-def nuget_version_sort_key(version_str: str) -> tuple:
-    """Return a sort key for NuGet SemVer comparison."""
-    if '-' in version_str:
-        version_part, prerelease = version_str.split('-', 1)
-    else:
-        version_part, prerelease = version_str, None
-    components = tuple(int(x) for x in version_part.split('.'))
-    if prerelease is None:
-        return (components, 1, '')
-    return (components, 0, prerelease)
-
-
 def resolve_missing_dependency_version(package_id: str, missing_version: str) -> str:
     """Query NuGet API for the closest newer version of a missing package."""
-    url = f'https://api.nuget.org/v3-flatcontainer/{package_id.lower()}/index.json'
-    r = requests.get(url)
-    r.raise_for_status()
-    available_versions = r.json()['versions']
+    available_versions = get_nuget_package_versions(package_id)
 
-    missing_key = nuget_version_sort_key(missing_version)
-    candidates = [v for v in available_versions if nuget_version_sort_key(v) > missing_key]
+    def numeric_parts(v: str) -> tuple:
+        return tuple(int(x) for x in v.split('-')[0].split('.'))
+
+    missing_parts = numeric_parts(missing_version)
+    candidates = [v for v in available_versions if numeric_parts(v) >= missing_parts]
     if not candidates:
         raise RuntimeError(f'No newer version found for {package_id} {missing_version}')
-    return min(candidates, key=nuget_version_sort_key)
+    return min(candidates, key=lambda v: (numeric_parts(v), available_versions.index(v)))
 
 
 def extract_dependencies_from_nuspec(nuspec_path: Path):
@@ -338,38 +318,34 @@ def remove_unused_dependencies(package_name: str, package_root_dir: Path):
 
 
 def index_nuget_package(package_name: str):
-    package_urls = get_nuget_package_versions(package_name)
+    package_versions = get_nuget_package_versions(package_name)
 
     if (config.NUM_OF_PACKAGES_TO_INDEX_PREVIEW is not None or
         config.NUM_OF_PACKAGES_TO_INDEX_STABLE is not None):
-        def is_preview(url: str):
-            return '-' in url.split('/')[-1]
+        def is_preview(version: str):
+            return '-' in version
 
-        package_urls_preview = list(filter(is_preview, package_urls))
-        package_urls_stable = list(filter(lambda url: not is_preview(url), package_urls))
+        versions_preview = list(filter(is_preview, package_versions))
+        versions_stable = list(filter(lambda v: not is_preview(v), package_versions))
 
         if config.NUM_OF_PACKAGES_TO_INDEX_PREVIEW is not None:
-            package_urls_preview = package_urls_preview[:config.NUM_OF_PACKAGES_TO_INDEX_PREVIEW]
+            versions_preview = versions_preview[-config.NUM_OF_PACKAGES_TO_INDEX_PREVIEW:]
 
         if config.NUM_OF_PACKAGES_TO_INDEX_STABLE is not None:
-            package_urls_stable = package_urls_stable[:config.NUM_OF_PACKAGES_TO_INDEX_STABLE]
+            versions_stable = versions_stable[-config.NUM_OF_PACKAGES_TO_INDEX_STABLE:]
 
-        package_urls = package_urls_preview + package_urls_stable
-
-    package_url_prefix = 'https://www.nuget.org/packages/'
+        package_versions = versions_preview + versions_stable
 
     # Shared dependencies directory for all versions of this package
     package_deps_dir = Path(package_name) / 'deps'
 
-    for package_url in sorted(package_urls):
-        assert package_url.startswith(f'{package_url_prefix}{package_name}/'), package_url
-        version_path = Path(package_url.removeprefix(package_url_prefix))
+    for package_version in package_versions:
+        version_path = Path(package_name) / package_version
         if version_path.exists():
             continue
 
-        print(f'Indexing {package_url}...')
+        print(f'Indexing {package_name} {package_version}...')
 
-        package_version = version_path.name
         version_path.mkdir(parents=True, exist_ok=True)
         process_package(package_name, package_version, version_path, package_deps_dir)
 
@@ -381,7 +357,7 @@ def index_nuget_package(package_name: str):
             if not path.is_dir() or path.name == 'deps':
                 continue
 
-            if f'{package_url_prefix}{package_name}/{path.name}' in package_urls:
+            if path.name in package_versions:
                 continue
 
             print(f'Removing {path}...')
