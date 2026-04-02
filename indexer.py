@@ -67,6 +67,32 @@ def parse_nuget_version(version_string: str) -> str:
     return min_version
 
 
+def nuget_version_sort_key(version_str: str) -> tuple:
+    """Return a sort key for NuGet SemVer comparison."""
+    if '-' in version_str:
+        version_part, prerelease = version_str.split('-', 1)
+    else:
+        version_part, prerelease = version_str, None
+    components = tuple(int(x) for x in version_part.split('.'))
+    if prerelease is None:
+        return (components, 1, '')
+    return (components, 0, prerelease)
+
+
+def resolve_missing_dependency_version(package_id: str, missing_version: str) -> str:
+    """Query NuGet API for the closest newer version of a missing package."""
+    url = f'https://api.nuget.org/v3-flatcontainer/{package_id.lower()}/index.json'
+    r = requests.get(url)
+    r.raise_for_status()
+    available_versions = r.json()['versions']
+
+    missing_key = nuget_version_sort_key(missing_version)
+    candidates = [v for v in available_versions if nuget_version_sort_key(v) > missing_key]
+    if not candidates:
+        raise RuntimeError(f'No newer version found for {package_id} {missing_version}')
+    return min(candidates, key=nuget_version_sort_key)
+
+
 def extract_dependencies_from_nuspec(nuspec_path: Path):
     """Extract dependencies from a .nuspec file."""
     tree = ET.parse(nuspec_path)
@@ -206,18 +232,13 @@ def process_package(package_id: str, package_version: str, package_dir: Path, de
                 if e.response.status_code != 404:
                     raise
 
+                # Clean up empty directory from failed download.
+                if dep_dir.exists() and not any(dep_dir.iterdir()):
+                    dep_dir.rmdir()
+
                 prev_version = dep['version']
-
-                # Check if this dependency has a version override.
-                override_found = False
-                for override in config.DEPENDENCY_VERSION_OVERRIDES:
-                    if dep['id'] == override['id'] and dep['version'] in override['old_versions']:
-                        dep = {'id': dep['id'], 'version': override['new_version']}
-                        override_found = True
-                        break
-
-                if not override_found:
-                    raise
+                new_version = resolve_missing_dependency_version(dep['id'], prev_version)
+                dep = {'id': dep['id'], 'version': new_version}
 
                 print(f'Dependency {dep["id"]} {prev_version} not found, trying {dep["version"]}...')
                 dep_dir = deps_dir / dep['id'] / dep['version']
