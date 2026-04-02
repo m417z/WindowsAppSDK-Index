@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.Windows.AI.MachineLearning</id>
+    <version>2.0.297-preview</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="file">license.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/microsoft/windowsappsdk</projectUrl>
+    <description>Microsoft Windows AI Machine Learning APIs. This package provides the Windows ML runtime, ONNX Runtime integration, and DirectML support for Windows desktop applications. Minimum OS: Windows 10 19H1 (Build 18362) or later. For support down to 17763, install Microsoft.WindowsAppSDK.ML.</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>WinML WindowsML Windows AI MachineLearning ML OnnxRuntime DirectML APIs</tags>
+    <dependencies>
+      <group targetFramework="net8.0-windows10.0.17763">
+        <dependency id="System.Numerics.Tensors" version="9.0.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
